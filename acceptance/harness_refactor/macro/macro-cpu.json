@@ -1,0 +1,95 @@
+{
+  "transport": "SCRIPTED_CALLBACK",
+  "real_cpu_jobs": true,
+  "source_run": "gxr_01m8fqtgpf441eqtrm",
+  "target_run": "gxr_01m8fqthm152y0qba6",
+  "target_input": "gxa_01m8fqthm9q9kd7949",
+  "recipe": "gauge-check@1",
+  "recipe_digest": "305c03ce1ec098a0a6c1e63a754e291f8f2196dcacf50e8de48151c5fe230a9f",
+  "bound_after_restart": {
+    "split": "node_b5b537748110123d3f8b0c52590cc62a",
+    "low": "node_9217cff4e95442e81b8a80999376fed8"
+  },
+  "target_jobs": [
+    {
+      "node_id": "node_b5b537748110123d3f8b0c52590cc62a",
+      "job_id": "gxj_01m8fqthph91ph6avq",
+      "result_ref": "gxa_01m8fqtj1mhstdr5j8",
+      "status": "SUCCEEDED"
+    },
+    {
+      "node_id": "node_9217cff4e95442e81b8a80999376fed8",
+      "job_id": "gxj_01m8fqtj422pvma0zg",
+      "result_ref": "gxa_01m8fqtjf1d23bs8nd",
+      "status": "SUCCEEDED"
+    }
+  ],
+  "outcome": {
+    "deadline": null,
+    "goal_version": 1,
+    "key": "recipe-239b70ff92d45af709d96b96",
+    "revision": 1,
+    "scope": "run",
+    "spec": {
+      "key": "recipe-239b70ff92d45af709d96b96",
+      "mode": "all",
+      "ports": [
+        {
+          "alternatives": [
+            {
+              "node_id": "node_9217cff4e95442e81b8a80999376fed8",
+              "output_name": "mean.json"
+            }
+          ],
+          "required": false,
+          "slot": "result"
+        }
+      ],
+      "question": "Are the gauge statistics consistent with the archives?"
+    },
+    "registration_event": 100,
+    "outcome_event": 115,
+    "state": "SATISFIED",
+    "outcome": {
+      "needed": 1,
+      "ports": [
+        {
+          "counted_artifact_ref": "gxa_01m8fqtjf1d23bs8nd",
+          "evidence": [
+            {
+              "artifact_ref": "gxa_01m8fqtjf1d23bs8nd",
+              "job_id": "gxj_01m8fqtj422pvma0zg",
+              "kind": "series_statistic",
+              "nature": "analysis",
+              "node_id": "node_9217cff4e95442e81b8a80999376fed8",
+              "output_name": "mean.json",
+              "sha256": "9e0dc1d005d684f08532c345a8742a1736e9afe6ef746d10c7b1569c1e3f6114"
+            }
+          ],
+          "required": false,
+          "slot": "result",
+          "sources": [
+            {
+              "job_id": "gxj_01m8fqtj422pvma0zg",
+              "job_state": "SUCCEEDED",
+              "node_id": "node_9217cff4e95442e81b8a80999376fed8",
+              "output_name": "mean.json",
+              "state": "AVAILABLE",
+              "status": "SUCCEEDED"
+            }
+          ],
+          "state": "AVAILABLE"
+        }
+      ],
+      "question": "Are the gauge statistics consistent with the archives?",
+      "satisfied_count": 1,
+      "state": "SATISFIED",
+      "still_possible_count": 0
+    }
+  },
+  "counted_readings": {
+    "readings": [
+      3
+    ]
+  }
+}

@@ -56,6 +56,11 @@ def require_compatible(original, latest, branch, decision):
 
 def job_demand(conn, run_id, jobs):
     """Only definite new work needs remaining child funds; JobService proves any actual reuse."""
+    from . import harness_policy
+    # New Goals allow a planned node to wait, reuse a result or never take its
+    # branch. JobService alone acquires its actual units under the admission writer.
+    if harness_policy.active(conn, run_id):
+        return {}
     demand = Counter()
     # Input binding can resolve a node to its actual bytes later. Reuse here is
     # provisional. It never grants launch authority if the final fingerprint differs.
@@ -76,6 +81,8 @@ def job_demand(conn, run_id, jobs):
 
 def require_budget(conn, module, demand):
     from . import v62_budget
+    if not demand:
+        return
     available = v62_budget.remaining(conn, module["budget_ref"])
     for key, amount in demand.items():
         if available.get(key, 0) < amount:

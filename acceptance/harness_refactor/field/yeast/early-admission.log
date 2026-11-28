@@ -1,0 +1,31 @@
+test_real_job_without_query_file (acceptance.harness_refactor.field.test_literal_archive.LiteralArchive.test_real_job_without_query_file) ... ERROR
+
+======================================================================
+ERROR: test_real_job_without_query_file (acceptance.harness_refactor.field.test_literal_archive.LiteralArchive.test_real_job_without_query_file)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/field/test_literal_archive.py", line 51, in test_real_job_without_query_file
+    settled = study.settle(reply["aliases"]["local:lookup"])
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/v62a/interleavings_fixture.py", line 241, in settle
+    self.advance()
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/v62a/interleavings_fixture.py", line 146, in advance
+    v6_jobs.advance(self.conn, self.run_id)
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_jobs.py", line 883, in advance
+    counts[_run_node(conn, node, service, window)] += 1
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_jobs.py", line 782, in _run_node
+    result = service.submit(**request, idempotency_key=node["operation_key"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/jobs/service.py", line 401, in submit
+    admitted = self._admit({**request, "step_index": step_index, "lease_ref": lease_ref}, request_sha, key, reserved_job_id=reserved_job_id)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/jobs/service.py", line 708, in _admit
+    module_binding=v6_jobs.module_methods.for_request(conn, request))
+                   ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'gx_core.p0.v6_jobs' has no attribute 'module_methods'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.653s
+
+FAILED (errors=1)

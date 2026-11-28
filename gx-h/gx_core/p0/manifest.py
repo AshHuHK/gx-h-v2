@@ -15,9 +15,9 @@ def _refuse(reason, message, **facts):
     raise SchemaInvalid(message, details={"reason": reason, **facts})
 
 
-def check_capability(conn, run_id, capability, *, review_probe=False):
+def check_capability(conn, run_id, capability, *, review_probe=False, module_binding=None):
     """GX checks the concrete capability, including hard constraints added after planning."""
-    if not review_probe and not shipped.participates(conn, run_id, capability):
+    if not review_probe and not shipped.participates(conn, run_id, capability, module_binding=module_binding):
         _refuse("run_composition", f"{capability} is outside this Run composition", capability=capability)
     cap_id, version = capability.rsplit("@", 1)
     if intent.forbidden_capability(cap_id, version, intent.active_items(conn, run_id, intent.BAN_TYPES)):
@@ -127,7 +127,9 @@ def admit(conn, job_id, *, launch, bundle, inputs, resources, prepared):
     row = conn.execute("SELECT * FROM jobs WHERE job_id=?", (job_id,)).fetchone()
     cap = launch["capability_version"]
     run_id = row["run_id"]
-    check_capability(conn, run_id, cap, review_probe=launch.get("purpose") == "probe")
+    from . import module_methods
+    local = module_methods.for_request(conn, launch["request"])
+    check_capability(conn, run_id, cap, review_probe=launch.get("purpose") == "probe", module_binding=local)
     binding = launch["request"].get("binding") or {}
     owner = _owner(conn, row, binding)
     if owner["kind"] == "durable_task":
@@ -193,7 +195,11 @@ def admit(conn, job_id, *, launch, bundle, inputs, resources, prepared):
     if owner["kind"] == "graph_node":
         from . import capability_views
         revision = capability_views.latest(conn, run_id)
-        if revision:
+        if local:
+            entry = local["descriptor"]
+            doc["module_capability"] = {key: local[key] for key in ("scope", "event_id", "revision")}
+            doc["module_capability"].update({key: entry[key] for key in ("portable_sha256", "plugin", "provider_closure") if key in entry})
+        elif revision:
             entry = next(record for record in revision["catalog"] if record["capability_version"] == cap)
             doc["goal_capability"] = {"revision":revision["revision"], "view_sha256":revision["digest"],
                                       **{key:entry[key] for key in ("portable_sha256","plugin","provider_closure")

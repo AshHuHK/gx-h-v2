@@ -1,5 +1,7 @@
 # GX-H V6.2.3 自主科研
 
+新研究的 Lead 可自行選法、委派與局部重開路線，並以具名證據喚醒後續決策。普通入口、舊 Run 相容及各類回執見[Harness 重構與研究分工](acceptance/harness_refactor/README.md)。
+
 GX 追蹤每項量測何時首次可得、哪位研究者實際收到，以及哪些數值進入正式結論。本版用兩份公開 mmCIF 原件檢查局部區段對幾何摘要的影響，並提供經官方 Codex 宿主執行的公開研究試點。[版本簽收](V623_ACCEPTANCE.md) · [真資料研究報告](acceptance/v623/V623_SCIENCE_REPORT.md) · [公開四格操作](acceptance/v623/oauth/README.md)
 
 ## 科研能力插件

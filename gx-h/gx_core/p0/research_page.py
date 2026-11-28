@@ -312,6 +312,11 @@ def page(result):
                                  f"另有 {len(gaps)-len(visible)} 项未决问题，见完整记录。")])
         lines.append("")
 
+    if signature := result.get("pi_signoff"):
+        signed = signature["status"] == "SIGNED"
+        lines.extend([tr("## PI signoff", "## PI 签署"), "",
+                      tr("Signed by ", "签署人 ") + signature["signer"] if signed else tr("Awaiting PI signature", "待 PI 签署"),
+                      signature["agreement"], ""])
     rejected = result["rejected_decisions"]
     event, closed = close["committed_event"], close["closed_event"]
     if rejected:

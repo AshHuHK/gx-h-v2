@@ -1,0 +1,32 @@
+test_simultaneous_inputs_prioritize_named_rows_and_retain_lineage (acceptance.harness_refactor.routes.test_compact_delivery.CompactLead.test_simultaneous_inputs_prioritize_named_rows_and_retain_lineage) ... FAIL
+
+======================================================================
+FAIL: test_simultaneous_inputs_prioritize_named_rows_and_retain_lineage (acceptance.harness_refactor.routes.test_compact_delivery.CompactLead.test_simultaneous_inputs_prioritize_named_rows_and_retain_lineage)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/routes/test_compact_delivery.py", line 136, in test_simultaneous_inputs_prioritize_named_rows_and_retain_lineage
+    self.assertEqual(run.returncode,0,run.stderr + run.stdout)
+AssertionError: 1 != 0 : Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/routes/test_compact_delivery.py", line 140, in <module>
+    study(Path(sys.argv[1]),Path(sys.argv[2]))
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/routes/test_compact_delivery.py", line 57, in study
+    card = s.call(lead,"gx_save_recipe",recipe,"save")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/v62a/interleavings_fixture.py", line 198, in call
+    reply = self.roots._call(payload)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/tmp9_fwjbi8/release/gx-h/gx_core/p0/roots.py", line 1143, in _call
+    return callback(self, p)
+           ^^^^^^^^^^^^^^^^^
+  File "/tmp/tmp9_fwjbi8/release/gx-h/gx_core/p0/v6_native.py", line 332, in call
+    return _call(roots, p)
+           ^^^^^^^^^^^^^^^
+  File "/tmp/tmp9_fwjbi8/release/gx-h/gx_core/p0/v6_native.py", line 357, in _call
+    raise ScopeDenied("This native thread has no delegated Scientific Lead tool")
+gx_core.errors.ScopeDenied: SCOPE_DENIED: This native thread has no delegated Scientific Lead tool
+
+
+----------------------------------------------------------------------
+Ran 1 test in 6.591s
+
+FAILED (failures=1)

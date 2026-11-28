@@ -388,7 +388,7 @@ def resolve(conn: sqlite3.Connection, capability_version: str, *, run_id=None) -
     return active_view(conn, candidate(conn, capability_version), run_id=run_id)
 
 
-def active_view(conn: sqlite3.Connection, view: dict[str, Any], *, run_id=None) -> dict[str, Any]:
+def active_view(conn: sqlite3.Connection, view: dict[str, Any], *, run_id=None, module_binding=None) -> dict[str, Any]:
     """The second half of :func:`resolve`, for a caller that already holds the
     :func:`candidate` view and had something to ask of it first (job admission asks the
     operator's switches before it says anything about a version's state): the view with its
@@ -406,7 +406,7 @@ def active_view(conn: sqlite3.Connection, view: dict[str, Any], *, run_id=None) 
             from ..plugins.runtime import recorded
             run = conn.execute("SELECT inputs_json FROM runs WHERE run_id=?", (run_id,)).fetchone()
             package_admitted = bool(run and (recorded(run) or {}).get("kind") == "goal"
-                                    and participates(conn, run_id, capability_version))
+                                    and participates(conn, run_id, capability_version, module_binding=module_binding))
     if shipped:
         view["admission"] = "SHIPPED"
     elif package_admitted:

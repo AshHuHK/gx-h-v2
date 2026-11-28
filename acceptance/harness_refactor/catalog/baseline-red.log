@@ -1,0 +1,50 @@
+test_cold_reopen_accepts_decision_on_new_evidence_without_overview (test_open_discovery.OpenDiscovery.test_cold_reopen_accepts_decision_on_new_evidence_without_overview) ... ERROR
+test_literature_only_and_explicit_empty_scope_remain_narrow (test_open_discovery.OpenDiscovery.test_literature_only_and_explicit_empty_scope_remain_narrow) ... ok
+test_method_facts_separate_deployment_and_scientific_execution (test_open_discovery.OpenDiscovery.test_method_facts_separate_deployment_and_scientific_execution) ... ERROR
+test_unqualified_question_honors_site_authority_without_activating_every_method (test_open_discovery.OpenDiscovery.test_unqualified_question_honors_site_authority_without_activating_every_method) ... FAIL
+
+======================================================================
+ERROR: test_cold_reopen_accepts_decision_on_new_evidence_without_overview (test_open_discovery.OpenDiscovery.test_cold_reopen_accepts_decision_on_new_evidence_without_overview)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/catalog/test_open_discovery.py", line 67, in test_cold_reopen_accepts_decision_on_new_evidence_without_overview
+    other.call(lead, "gx_decide_revision", {"decision":draft(watches=WATCH)}, "use-evidence")
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/harness-refactor-baseline-50d31f5/acceptance/v62a/interleavings_fixture.py", line 198, in call
+    reply = self.roots._call(payload)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/harness-refactor-baseline-50d31f5/gx-h/gx_core/p0/roots.py", line 1137, in _call
+    return callback(self, p)
+           ^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/harness-refactor-baseline-50d31f5/gx-h/gx_core/p0/v6_native.py", line 266, in call
+    return _call(roots, p)
+           ^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/harness-refactor-baseline-50d31f5/gx-h/gx_core/p0/v6_native.py", line 360, in _call
+    prepared = v6_decisions.prepare(roots.conn, **identity, decision=args["decision"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/harness-refactor-baseline-50d31f5/gx-h/gx_core/p0/v6_decisions.py", line 208, in prepare
+    catalog_survey.required(conn, json.loads(task["snapshot_json"]))
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/harness-refactor-baseline-50d31f5/gx-h/gx_core/p0/catalog_survey.py", line 154, in required
+    raise SchemaInvalid(INSTRUCTION, details={"reason": "CATALOG_SURVEY_REQUIRED",
+gx_core.errors.SchemaInvalid: SCHEMA_INVALID: Before deciding, survey this research state with gx_query_catalog(kind=all), unless catalog_discovery already includes a survey_event. Use the current scientific question, available inputs and outputs you need. You may investigate background in the same turn and search again whenever useful. An empty survey permits any authorized next action, including investigating a gap.
+
+======================================================================
+ERROR: test_method_facts_separate_deployment_and_scientific_execution (test_open_discovery.OpenDiscovery.test_method_facts_separate_deployment_and_scientific_execution)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/catalog/test_open_discovery.py", line 76, in test_method_facts_separate_deployment_and_scientific_execution
+    self.assertEqual(hit["capability_facts"], {"reference_only":False,"installed":True,"dependency_ready":True,"executed_in_run":False})
+                     ~~~^^^^^^^^^^^^^^^^^^^^
+KeyError: 'capability_facts'
+
+======================================================================
+FAIL: test_unqualified_question_honors_site_authority_without_activating_every_method (test_open_discovery.OpenDiscovery.test_unqualified_question_honors_site_authority_without_activating_every_method)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/catalog/test_open_discovery.py", line 37, in test_unqualified_question_honors_site_authority_without_activating_every_method
+    self.assertTrue(LOOKUP in choices, "No scoped archive query in frozen site choices")
+AssertionError: False is not true : No scoped archive query in frozen site choices
+
+----------------------------------------------------------------------
+Ran 4 tests in 1.745s
+
+FAILED (failures=1, errors=2)

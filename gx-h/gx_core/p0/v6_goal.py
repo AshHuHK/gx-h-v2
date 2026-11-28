@@ -9,7 +9,7 @@ from ..artifacts import ArtifactService
 from ..domain import clock, ids, machines
 from ..errors import ArtifactHashMismatch, ArtifactNotFound, SchemaInvalid, StaleRevision, VersionImmutable
 from ..persistence import records, store
-from . import catalog_survey, intent, research_dialogue, research_window
+from . import catalog_survey, harness_policy, intent, module_methods, research_dialogue, research_window
 
 INSTANCE_ID = "gx.v6.instance"
 ACTOR = "gx-v6"
@@ -25,6 +25,7 @@ def cli_spec(args):
         "budget_profile",
         "turn_token_budget",
         "initial_job_limit",
+        "closing_terms",
         "research_window",
         "research_effort",
         "research_modules",
@@ -83,6 +84,7 @@ def cli_spec(args):
     if getattr(args, "command", None) == "research" and not spec.get("historical_replay"):
         from .capability_views import DISCOVERY_POLICY
         spec["discovery_policy"] = DISCOVERY_POLICY
+        spec["harness_policy"] = harness_policy.VERSION
     return spec
 
 
@@ -98,6 +100,11 @@ def start(conn, spec, *, run_key, current):
 
     if "research_window" in spec:
         research_window.validate(spec["research_window"])
+    if "closing_terms" in spec:
+        from . import research_closeout
+        if not harness_policy.enabled(spec):
+            raise SchemaInvalid("closing_terms requires the current research Goal")
+        research_closeout.validate_terms(spec["closing_terms"], spec.get("input_files", []))
     if "initial_job_limit" in spec:
         limit = spec["initial_job_limit"]
         if type(limit) is not int or limit < 0:
@@ -152,6 +159,8 @@ def start(conn, spec, *, run_key, current):
         from . import v6_prospective
         v6_prospective.validate_opening(spec, public)
     inputs = {"p0": True, "mode": "goal", "p0_spec": spec, "capability_catalog": public}
+    if harness_policy.enabled(spec):
+        inputs["harness_policy"] = harness_policy.VERSION
     if method_scope is not None:
         inputs.update(method_scope=method_scope, discovery_policy=capability_views.DISCOVERY_POLICY)
     inputs["evidence_policy"] = policy
@@ -348,9 +357,10 @@ def _events(conn, rid, after, budget_ref=None):
         SELECT event_id,kind,subject_id,payload_json FROM events
         WHERE event_id>? AND (
           (run_id=? AND (kind IN ('v6.node.settled','v6.observation.added','v6.intent.changed',
-                                  'v6.claim.adopted','v6.decision.superseded','v6.prospective.opening_wait','v62.round.settled',
+                                  'v6.claim.adopted','v6.route.revised','v6.decision.superseded','v6.prospective.opening_wait','v62.round.settled',
                                   'v62.claim.reassessed','v62.module.wake','v62.module.invalidated','v621.material.assigned',
-                                  'research.pi.feedback','research.pi.answered','research.capabilities.changed','research.catalog.updated') OR
+                                  'research.pi.feedback','research.pi.answered','research.capabilities.changed','research.catalog.updated','research.join.ready') OR
+          (kind='v6.node.waiting' AND json_extract(payload_json,'$.funding_scope') IS NOT NULL) OR
           (kind IN ('v62.source.extracted','v62.source.reviewed') AND json_extract(payload_json,'$.scope')='run') OR
           (kind='run.transition' AND prev_state='PAUSED' AND json_extract(payload_json,'$.action')='continue')))
           OR (kind IN ('budget.tightened','budget.raised','budget.allotment_changed') AND
@@ -397,9 +407,11 @@ def _matches(row, watches, rid):
     payload = store.loads(row, "payload_json")
     kind = row["kind"]
     events = {
+        "research.join.ready": set(),
         research_dialogue.ANSWER: set(),
         research_dialogue.FEEDBACK: set(),
         "v6.decision.superseded": set(),
+        "v6.route.revised": set(),
         "v6.prospective.opening_wait": set(),
         "v62.module.invalidated": set(),
         "v6.intent.changed": {"goal_changed"},
@@ -489,11 +501,18 @@ def _run_wakes(conn, rid, prior, events):
                 return True
             continue
         payload = store.loads(row, "payload_json")
+        if row["kind"] == "v6.node.waiting" and payload.get("funding_scope"):
+            return True
+        if row["kind"] == "v6.route.revised":
+            # An unbound question without a specific wait, or a reopened route, needs a fresh decision.
+            if payload.get("needs_decision"):
+                return True
+            continue
         if row["kind"] == "v6.claim.adopted" and payload.get("decision_ref") == prior["decision_ref"]:
             continue
         if prior["survey_cursor"] is not None and row["kind"] in catalog_survey.UPDATES:
             return True
-        if (row["kind"] in {research_dialogue.FEEDBACK, research_dialogue.ANSWER, "v6.intent.changed", "research.capabilities.changed", "v62.module.wake", "v62.module.invalidated", "v621.material.assigned"} or _operator_evidence(conn, rid, row)
+        if (row["kind"] in {"research.join.ready", research_dialogue.FEEDBACK, research_dialogue.ANSWER, "v6.intent.changed", "research.capabilities.changed", "v62.module.wake", "v62.module.invalidated", "v621.material.assigned"} or _operator_evidence(conn, rid, row)
                 or row["kind"] == "v6.decision.superseded" and payload.get("scope") == "run"
                 or row["kind"] == "v62.round.settled" and payload.get("reconsider")
                 or row["kind"] == "v62.claim.reassessed" and payload.get("critical_counterevidence")
@@ -539,7 +558,7 @@ def _brief(conn, run, goal, head, events, cursor, prior):
     observations = []
     refs = [f["artifact_ref"] for f in files]
     for row in events:
-        if row["kind"] in {research_dialogue.ANSWER, research_dialogue.FEEDBACK, "v621.material.assigned", "v6.prospective.opening_wait", catalog_survey.INVENTORY}:
+        if row["kind"] in {"v6.route.revised", "research.join.ready", research_dialogue.ANSWER, research_dialogue.FEEDBACK, "v621.material.assigned", "v6.prospective.opening_wait", catalog_survey.INVENTORY}:
             continue  # Assignment already has an acquisition. An opening wait supplies no evidence.
         p = store.loads(row, "payload_json")
         ref = p.get("result_ref") or p.get("artifact_ref")
@@ -573,14 +592,18 @@ def _brief(conn, run, goal, head, events, cursor, prior):
                     content = ArtifactService(conn).read_json(ref)
                     job = (
                         conn.execute(
-                            "SELECT capability_id,capability_version FROM jobs WHERE job_id=? AND run_id=?",
-                            (p.get("job_id"), rid),
+                            """SELECT j.capability_id,j.capability_version,n.spec_json FROM jobs j
+                               LEFT JOIN v6_nodes n ON n.run_id=j.run_id AND n.node_id=?
+                               WHERE j.job_id=? AND j.run_id=?""",
+                            (p.get("node_id",row["subject_id"]), p.get("job_id"), rid),
                         ).fetchone()
                         if row["kind"] == "v6.node.settled"
                         else None
                     )
                     if job:
-                        provider = goal_plugins.method(conn, rid, f"{job[0]}@{job[1]}", historical=True)
+                        binding = module_methods.for_spec(conn, rid, json.loads(job[2])) if job[2] else None
+                        provider = goal_plugins.method(conn, rid, f"{job[0]}@{job[1]}", historical=True,
+                                                       module_binding=binding)
                         if provider and provider.project:
                             content = provider.project(content)
                     facts["observation"] = content
@@ -705,6 +728,19 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         for row in events
     ]
     for change, event in zip(deltas, events):
+        if event["kind"] == "v6.node.waiting":
+            payload = store.loads(event, "payload_json")
+            scope = payload["funding_scope"]
+            detail = payload["details"]
+            change["scope"] = scope
+            if scope != "run":
+                # The Lead may reassign a module's funding. Its unpublished
+                # scientific subjects continue to belong to the module.
+                change["subject_ref"] = scope
+            change["shortfalls"] = detail.get("shortfalls", [])
+            change["held_reservations"] = [
+                {"reservation_ref": hold["reservation_ref"], "amounts": hold["amounts"]}
+                for hold in detail.get("held_reservations", [])]
         if event["kind"] in {"v62.module.wake", "v62.module.invalidated"}:
             payload = store.loads(event, "payload_json")
             change.update({k: payload[k] for k in ("round", "reason", "module_instance_ids", "module_instance_id", "report_refs", "goal_version") if k in payload})
@@ -738,6 +774,15 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         "budget": budget,
     }
     from . import capability_views
+    if harness_policy.enabled(data["inputs"]):
+        brief["harness_policy"] = harness_policy.VERSION
+        from . import research_joins
+        research_joins.attach(conn, rid, cursor, brief)
+    if harness_policy.enabled(data["inputs"]) and head:
+        from . import v6_routes
+        routes = v6_routes.projection(conn, rid, head, version=goal["goal_version"])
+        if routes:
+            brief["research_intents"] = routes
     revision = capability_views.latest(conn, rid)
     method_options = capability_views.goal_options(data.get("inputs", {}))
     if revision or method_options:
@@ -825,6 +870,14 @@ def _brief(conn, run, goal, head, events, cursor, prior):
         brief["pi_dialogue"] = dialogue
     if recipe_decisions:
         brief["recipe_decisions"] = recipe_decisions
+    if harness_policy.enabled(brief):
+        from . import research_topics
+        findings = research_topics.lead_preview(conn, rid, goal["goal_version"], brief["evidence_refs"])
+        if findings:
+            brief["research_topic_findings"] = findings
+    if harness_policy.enabled(brief):
+        from . import research_closeout
+        research_closeout.attach(conn, brief, data["files"], grant.get("closing_terms", {}), cursor)
     v62_lead.describe_refresh(conn, brief, events)
     if data["inputs"].get("discovery_policy") == catalog_survey.POLICY:
         brief.setdefault("research_effort", "quick")
@@ -841,6 +894,8 @@ def ensure_task(conn, run_id):
     goal = conn.execute("SELECT * FROM v6_goals WHERE run_id=?", (run_id,)).fetchone()
     if not goal or goal["status"] != "OPEN" or run["status"] != "ACTIVE":
         return None
+    from . import research_joins
+    research_joins.tick(conn, run_id)
     if research_dialogue.blocked(conn, run_id, scope="run"):
         return None
     inputs = store.loads(run, "inputs_json")["inputs"]
@@ -1133,6 +1188,11 @@ def waiting_for(conn, rid):
         return {**visible, "kind": "pi_answer", "continue_with": "gx-p0 message --question-id ID --text ANSWER"}
     if modules:
         return {**visible, "kind": "module_reports", "modules": modules, "continue_with": "gx-p0 run"}
+    from . import research_joins
+    watches_pending = [r for r in research_joins.view(conn, rid) if r["state"] == "WAITING"]
+    if watches_pending:
+        return {**visible, "kind": "research_join", "joins": [{k: r[k] for k in ("key", "revision", "deadline")}
+                for r in watches_pending], "continue_with": "gx-p0 run"}
     prior = _latest(conn, rid)
     if prior:
         version = conn.execute("SELECT goal_version FROM v6_goals WHERE run_id=?", (rid,)).fetchone()[0]
@@ -1191,6 +1251,9 @@ def projection(conn, run, meter):
         ],
     }
     inputs = store.loads(run, "inputs_json")["inputs"]
+    if harness_policy.enabled(inputs) and result["graph_head"]:
+        from . import v6_routes
+        result["research_intents"] = v6_routes.projection(conn, rid, result["graph_head"], version=g["goal_version"])
     if window := inputs.get("p0_spec", {}).get("research_window"):
         result.update(research_window=window, research_window_phase=research_window.phase(window))
     if inputs.get("study_class"):

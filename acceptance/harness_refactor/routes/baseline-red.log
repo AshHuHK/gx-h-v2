@@ -1,0 +1,77 @@
+test_atomic_binding_and_process_death_after_launch_recover_one_job (acceptance.harness_refactor.routes.test_routes.RouteStudy.test_atomic_binding_and_process_death_after_launch_recover_one_job) ... ERROR
+test_evidence_only_resolution_and_reopen_preserve_other_route (acceptance.harness_refactor.routes.test_routes.RouteStudy.test_evidence_only_resolution_and_reopen_preserve_other_route) ... ERROR
+
+======================================================================
+ERROR: test_atomic_binding_and_process_death_after_launch_recover_one_job (acceptance.harness_refactor.routes.test_routes.RouteStudy.test_atomic_binding_and_process_death_after_launch_recover_one_job)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/routes/test_routes.py", line 84, in test_atomic_binding_and_process_death_after_launch_recover_one_job
+    route, = self.opened("instrument")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/routes/test_routes.py", line 44, in opened
+    receipt = self.act("open", [dict(op="open_intent", intent="local:" + name, question="Check " + name)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/routes/test_routes.py", line 39, in act
+    return self.study.call(self.lead, "gx_decide_revision", {"decision": {
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/v62a/interleavings_fixture.py", line 198, in call
+    reply = self.roots._call(payload)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/roots.py", line 1137, in _call
+    return callback(self, p)
+           ^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_native.py", line 266, in call
+    return _call(roots, p)
+           ^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_native.py", line 360, in _call
+    prepared = v6_decisions.prepare(roots.conn, **identity, decision=args["decision"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_decisions.py", line 217, in prepare
+    v6_graph._shape(decision, wire["inputSchema"]["properties"]["decision"])
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_graph.py", line 64, in _shape
+    _shape(value[name], child, measurement_branch=measurement_branch, path=f"{path}.{name}",
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_graph.py", line 45, in _shape
+    _shape(item, spec["items"], measurement_branch=measurement_branch, path=f"{path}[{i}]",
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_graph.py", line 54, in _shape
+    raise reject(f"Unknown graph operation {value.get('op')!r}", field=f"{path}.op")
+gx_core.errors.SchemaInvalid: SCHEMA_INVALID: $.ops[0].op: Unknown graph operation 'open_intent'
+
+======================================================================
+ERROR: test_evidence_only_resolution_and_reopen_preserve_other_route (acceptance.harness_refactor.routes.test_routes.RouteStudy.test_evidence_only_resolution_and_reopen_preserve_other_route)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/routes/test_routes.py", line 55, in test_evidence_only_resolution_and_reopen_preserve_other_route
+    first, second = self.opened("geometry", "format")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/routes/test_routes.py", line 44, in opened
+    receipt = self.act("open", [dict(op="open_intent", intent="local:" + name, question="Check " + name)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/routes/test_routes.py", line 39, in act
+    return self.study.call(self.lead, "gx_decide_revision", {"decision": {
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/v62a/interleavings_fixture.py", line 198, in call
+    reply = self.roots._call(payload)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/roots.py", line 1137, in _call
+    return callback(self, p)
+           ^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_native.py", line 266, in call
+    return _call(roots, p)
+           ^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_native.py", line 360, in _call
+    prepared = v6_decisions.prepare(roots.conn, **identity, decision=args["decision"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_decisions.py", line 217, in prepare
+    v6_graph._shape(decision, wire["inputSchema"]["properties"]["decision"])
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_graph.py", line 64, in _shape
+    _shape(value[name], child, measurement_branch=measurement_branch, path=f"{path}.{name}",
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_graph.py", line 45, in _shape
+    _shape(item, spec["items"], measurement_branch=measurement_branch, path=f"{path}[{i}]",
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_graph.py", line 54, in _shape
+    raise reject(f"Unknown graph operation {value.get('op')!r}", field=f"{path}.op")
+gx_core.errors.SchemaInvalid: SCHEMA_INVALID: $.ops[0].op: Unknown graph operation 'open_intent'
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.969s
+
+FAILED (errors=2)

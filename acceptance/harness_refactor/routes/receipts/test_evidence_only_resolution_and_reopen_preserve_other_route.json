@@ -1,0 +1,122 @@
+{
+  "kind": "CONTROLLED_NATIVE",
+  "transport": "controlled native transport; real GX and local CPU runner",
+  "run": "gxr_01m8fqhgxjf18jy0er",
+  "goal": "Check the numerical instrument archive.",
+  "events": [
+    {
+      "event_id": 28,
+      "kind": "v6.route.revised",
+      "subject_id": "intent_f0b75d684cf2639485986713292ecaa3",
+      "payload": {
+        "context_ref": "gxcx_01m8fqhgyx2kenb3vt",
+        "decision_ref": "gxa_9324f26710ad7863d2147e7c5d90d5119ec7101d85bef9ddbd39920ca395a3c4",
+        "goal_version": 1,
+        "graph_version": 1,
+        "needs_decision": true,
+        "op": "open_intent",
+        "revision": 1,
+        "scope": "run"
+      }
+    },
+    {
+      "event_id": 29,
+      "kind": "v6.route.revised",
+      "subject_id": "intent_82df71d08060001a134bc559e68b8b30",
+      "payload": {
+        "context_ref": "gxcx_01m8fqhgyx2kenb3vt",
+        "decision_ref": "gxa_9324f26710ad7863d2147e7c5d90d5119ec7101d85bef9ddbd39920ca395a3c4",
+        "goal_version": 1,
+        "graph_version": 1,
+        "needs_decision": true,
+        "op": "open_intent",
+        "revision": 1,
+        "scope": "run"
+      }
+    },
+    {
+      "event_id": 40,
+      "kind": "v6.route.revised",
+      "subject_id": "intent_f0b75d684cf2639485986713292ecaa3",
+      "payload": {
+        "context_ref": "gxcx_01m8fqhh2w07sd8ct8",
+        "decision_ref": "gxa_ea3718ac1c4e830088eb446b4c218a4f1f0fd2b6f66a01d2d401f1feffed2ca1",
+        "goal_version": 1,
+        "graph_version": 2,
+        "op": "resolve_intent",
+        "revision": 2,
+        "scope": "run"
+      }
+    },
+    {
+      "event_id": 41,
+      "kind": "v6.route.revised",
+      "subject_id": "intent_82df71d08060001a134bc559e68b8b30",
+      "payload": {
+        "context_ref": "gxcx_01m8fqhh2w07sd8ct8",
+        "decision_ref": "gxa_ea3718ac1c4e830088eb446b4c218a4f1f0fd2b6f66a01d2d401f1feffed2ca1",
+        "goal_version": 1,
+        "graph_version": 2,
+        "op": "converge_intent",
+        "revision": 2,
+        "scope": "run"
+      }
+    },
+    {
+      "event_id": 48,
+      "kind": "research.pi.feedback",
+      "subject_id": "pif_18bf913ca1c832a2b5ac50f8ebb4d81d",
+      "payload": {
+        "artifact_refs": [],
+        "branch_id": null,
+        "feedback_id": "pif_18bf913ca1c832a2b5ac50f8ebb4d81d",
+        "goal_version": 1,
+        "scope": "run",
+        "source_kind": "information",
+        "source_message_id": "format-note",
+        "text": "The archive format specification changed."
+      }
+    },
+    {
+      "event_id": 56,
+      "kind": "v6.route.revised",
+      "subject_id": "intent_82df71d08060001a134bc559e68b8b30",
+      "payload": {
+        "context_ref": "gxcx_01m8fqhh4gh6f54xnv",
+        "decision_ref": "gxa_2a30bee64ef9ef5295c2849a5935edd2c66d120b9d9f1a036229bc4bb8d5b27b",
+        "goal_version": 1,
+        "graph_version": 3,
+        "needs_decision": true,
+        "op": "reopen_intent",
+        "revision": 3,
+        "scope": "run"
+      }
+    }
+  ],
+  "routes": {
+    "intent_82df71d08060001a134bc559e68b8b30": {
+      "binding_state": "INTENT_UNBOUND",
+      "evidence_refs": [],
+      "feedback_id": "pif_18bf913ca1c832a2b5ac50f8ebb4d81d",
+      "goal_version": 1,
+      "intent": "intent_82df71d08060001a134bc559e68b8b30",
+      "last_context_ref": "gxcx_01m8fqhh4gh6f54xnv",
+      "phase": "OPEN",
+      "question": "Check format",
+      "revision": 3
+    },
+    "intent_f0b75d684cf2639485986713292ecaa3": {
+      "binding_state": "INTENT_UNBOUND",
+      "evidence_refs": [
+        "gxa_01m8fqhgxxjmp1e4fd"
+      ],
+      "goal_version": 1,
+      "intent": "intent_f0b75d684cf2639485986713292ecaa3",
+      "last_context_ref": "gxcx_01m8fqhh2w07sd8ct8",
+      "phase": "RESOLVED",
+      "question": "Check geometry",
+      "revision": 2
+    }
+  },
+  "jobs": []
+}

@@ -457,8 +457,14 @@ def _streak(conn, rid, threshold):
     return bool(entry and entry[0] >= threshold)
 
 
-def require_exploration(conn, rid):
+def require_exploration(conn, rid, *, route_intent=None):
     """The ordinary module admission owner calls this after its duplicate-operation lookup."""
+    if route_intent is not None:
+        from . import harness_policy, v6_routes
+        if not harness_policy.active(conn, rid):
+            raise ScopeDenied("This Goal does not support route-scoped delegation")
+        v6_routes.require_open(conn, rid, route_intent)
+        return
     policy = _policy(conn, rid)
     if policy and (_convergence(conn, rid) or (not policy.advisory and _streak(conn, rid, policy.threshold))):
         raise ScopeDenied("Exploration is closed to new modules; use the Lead's convergence or closing decision")
@@ -473,6 +479,9 @@ def brief(conn, rid, cursor):
     entered, waiting = _convergence(conn, rid, cursor), _waiting(conn, rid)
     if entered:
         phase, options = "converging", ["assess_candidates", "close_run"]
+        from . import harness_policy
+        if harness_policy.active(conn, rid):
+            options.append("reopen_intent")
     elif streak >= policy.threshold and policy.advisory:
         phase, options = "reconsider", ["explore", "wait"]
         if not waiting:
@@ -548,7 +557,9 @@ def adopt(conn, request, decision_ref, task):
         raise RuntimeError("Record research choices in the adopting decision's transaction")
     converged = _convergence(conn, rid)
     if policy.advisory and converged and any(op["op"] == "open_branch" for op in decision["ops"]):
-        raise ScopeDenied("This Run has entered convergence; assess its selected candidates or close")
+        from . import harness_policy, v6_routes
+        if not harness_policy.active(conn, rid) or not v6_routes.locally_bound_openings(conn, rid, decision["ops"]):
+            raise ScopeDenied("This Run has entered convergence; assess its candidates or reopen an affected route")
     due = not converged and _streak(conn, rid, policy.threshold)
     closes = any(op["op"] == "close_run" for op in decision["ops"])
     if not (due or entered is not None or resolved):

@@ -1,0 +1,22 @@
+test_two_modules_choose_independently_and_job_records_its_provider (acceptance.harness_refactor.modules.test_local_selection.LocalSelections.test_two_modules_choose_independently_and_job_records_its_provider) ... ERROR
+
+======================================================================
+ERROR: test_two_modules_choose_independently_and_job_records_its_provider (acceptance.harness_refactor.modules.test_local_selection.LocalSelections.test_two_modules_choose_independently_and_job_records_its_provider)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/modules/test_local_selection.py", line 22, in test_two_modules_choose_independently_and_job_records_its_provider
+    with tempfile.TemporaryDirectory() as tmp, Scenario(Path(tmp), spec_updates=spec) as study:
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/v62a/interleavings_fixture.py", line 90, in __enter__
+    self._start_goal()
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/v62a/interleavings_fixture.py", line 133, in _start_goal
+    raise RuntimeError(f"Public start failed: {outcome.stderr} {outcome.stdout}")
+RuntimeError: Public start failed: SchemaInvalid: SCHEMA_INVALID: Goal config accepts only branch_delegation, budget_profile, capabilities, capability_collections, capability_options, evidence_policy, historical_replay, initial_job_limit, input_files, intent_items, max_parallel_roots, module_policy, plugins, project, prospective_opening, research_effort, research_modules, research_window, run_budget, turn_token_budget, workspace, workspace_budget
+ 
+
+----------------------------------------------------------------------
+Ran 1 test in 0.400s
+
+FAILED (errors=1)
+
+Baseline scoped callback probe, existing data_inventory module on 50d31f5
+Existing module callback: SCOPE_DENIED SCOPE_DENIED: This native thread has no delegated Scientific Lead tool

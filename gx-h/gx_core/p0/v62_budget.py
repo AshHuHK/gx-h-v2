@@ -27,11 +27,16 @@ def open_child(conn, run_id, instance_id, limits, actor):
     parent = budgets.budget_for(conn, run_id=run_id)
     promises = _branch_promises(conn, run_id)
     room, earmarked = _unallocated(conn, run_id, parent, allocation)
+    shortfalls = []
     for key, amount in allocation.items():
-        if amount and amount + promises[key] > room.get(key, 0):
-            raise BudgetExceeded("Unallocated Run budget cannot fund this module",
-                                 details={"key": key, "requested": amount, "available": room.get(key, 0),
-                                          "outstanding_branch_allowances": promises[key]})
+        available = room.get(key, 0) - promises[key]
+        if amount and amount > available:
+            shortfalls.append({"key": key, "requested": amount, "available": available,
+                               "short_by": amount - available, "outstanding_branch_allowances": promises[key]})
+    if shortfalls:
+        raise BudgetExceeded("Unallocated Run budget cannot fund this module", details={
+            **shortfalls[0], "budget_ref": parent, "shortfalls": shortfalls,
+            "held_reservations": budgets.held_details(conn, parent, {line["key"] for line in shortfalls})})
     requested = {k: v + promises[k] + earmarked[k] for k, v in allocation.items() if v}
     for error in budgets._project_reservation_errors(conn, parent, requested):
         raise error

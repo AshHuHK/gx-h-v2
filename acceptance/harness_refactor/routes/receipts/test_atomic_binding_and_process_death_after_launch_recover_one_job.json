@@ -1,0 +1,101 @@
+{
+  "kind": "FAULT_INJECTION",
+  "transport": "controlled native transport; real GX and local CPU runner",
+  "run": "gxr_01m8fqhaw38kjz62p1",
+  "goal": "Check the numerical instrument archive.",
+  "events": [
+    {
+      "event_id": 28,
+      "kind": "v6.route.revised",
+      "subject_id": "intent_55a3e98f46ac2cf5b58cb3c7d9c2afaa",
+      "payload": {
+        "context_ref": "gxcx_01m8fqhaxftam46200",
+        "decision_ref": "gxa_701639acddc69fb51dc575c0555ddf9e9fb080b3de2b77c8508c7fda86448ae2",
+        "goal_version": 1,
+        "graph_version": 1,
+        "needs_decision": true,
+        "op": "open_intent",
+        "revision": 1,
+        "scope": "run"
+      }
+    },
+    {
+      "event_id": 39,
+      "kind": "v6.route.revised",
+      "subject_id": "intent_55a3e98f46ac2cf5b58cb3c7d9c2afaa",
+      "payload": {
+        "context_ref": "gxcx_01m8fqhb8bemnnyfyc",
+        "decision_ref": "gxa_9de12d8e9ac551f6affee38c2a2612d3db5a71d925535b5d1abd0b021bec3590",
+        "goal_version": 1,
+        "graph_version": 2,
+        "op": "bind_intent",
+        "revision": 2,
+        "scope": "run"
+      }
+    },
+    {
+      "event_id": 56,
+      "kind": "v6.node.settled",
+      "subject_id": "node_1f94496eb29089c3522b6fb108b9489f",
+      "payload": {
+        "branch_id": "branch_b54cfc8b21507c0e6da38e367804959f",
+        "decision_ref": "gxa_9de12d8e9ac551f6affee38c2a2612d3db5a71d925535b5d1abd0b021bec3590",
+        "exec_key": "4503caf22bb8294b29678a28a6c8b050a47415a29760d31d28da746b6a8ae89d",
+        "job_id": "gxj_01m8fqhbkn4r2hd3yc",
+        "node_id": "node_1f94496eb29089c3522b6fb108b9489f",
+        "observed_job_status": "SUCCEEDED",
+        "operation_key": "v6.node:f9c431e501ae860f104d3a1ae71b2a1e11d9c67b8da7506ad656d008b418e723",
+        "result_ref": "gxa_01m8fqhc1ps2tpsd4m",
+        "reused_from": null,
+        "status": "SUCCEEDED"
+      }
+    }
+  ],
+  "launch": {
+    "job_id": "gxj_01m8fqhbkn4r2hd3yc",
+    "runner_pid": 1228079,
+    "runner_started": "3014379528"
+  },
+  "node": "node_1f94496eb29089c3522b6fb108b9489f",
+  "job_id": "gxj_01m8fqhbkn4r2hd3yc",
+  "result_ref": "gxa_01m8fqhc1ps2tpsd4m",
+  "route": {
+    "binding": {
+      "nodes": [
+        "node_1f94496eb29089c3522b6fb108b9489f"
+      ]
+    },
+    "binding_state": "BOUND_EXECUTABLE",
+    "executions": [
+      {
+        "intent_revision": 2,
+        "job_id": "gxj_01m8fqhbkn4r2hd3yc",
+        "node_id": "node_1f94496eb29089c3522b6fb108b9489f",
+        "result_ref": "gxa_01m8fqhc1ps2tpsd4m",
+        "status": "SUCCEEDED",
+        "version": 2
+      }
+    ],
+    "goal_version": 1,
+    "intent": "intent_55a3e98f46ac2cf5b58cb3c7d9c2afaa",
+    "last_context_ref": "gxcx_01m8fqhb8bemnnyfyc",
+    "phase": "OPEN",
+    "question": "Check instrument",
+    "revision": 2
+  },
+  "additional_launches": 0,
+  "process_exit": 73,
+  "recovery_exit": 75,
+  "recovery_wait": {
+    "kind": "decision",
+    "tasks": [
+      {
+        "task_id": "gxt_01m8fqhc2rdt6h2540",
+        "scope": "run",
+        "context_ref": "gxcx_01m8fqhc2r9c2s82rb",
+        "status": "READY"
+      }
+    ],
+    "continue_with": "gx-p0 run"
+  }
+}

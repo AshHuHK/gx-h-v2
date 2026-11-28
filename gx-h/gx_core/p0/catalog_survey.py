@@ -7,7 +7,7 @@ from .. import config
 from ..domain import ids
 from ..errors import SchemaInvalid
 from ..persistence import store
-from . import catalog_resources
+from . import catalog_resources, harness_policy
 from .capability_views import DISCOVERY_POLICY as POLICY
 
 INVENTORY = "research.catalog.updated"
@@ -21,6 +21,17 @@ INSTRUCTION = ("Before deciding, survey this research state with gx_query_catalo
                "Use the current scientific question, available inputs and outputs you need. "
                "You may investigate background in the same turn and search again whenever useful. "
                "An empty survey permits any authorized next action, including investigating a gap.")
+
+OPENING_INSTRUCTION = ("Take one overview with gx_query_catalog(kind=all) before your first decision. "
+                       "An empty overview is sufficient. After opening_survey_event, choose freely whether "
+                       "to search again or act directly on new evidence. Use the question, available inputs "
+                       "and outputs needed for any subsequent searches.")
+
+
+def _opening_event(conn, rid):
+    row = conn.execute("SELECT event_id FROM events WHERE run_id=? AND kind='research.catalog.surveyed' "
+                       "AND subject_kind='catalog_survey' ORDER BY event_id LIMIT 1", (rid,)).fetchone()
+    return row[0] if row else None
 
 
 @lru_cache(maxsize=16)
@@ -132,6 +143,8 @@ def describe(conn, brief, prior, observed_inputs, *, catalog_sources=None):
     if feedback:
         latest = max(feedback, key=lambda i: i.get("answer_event_id") or i.get("event_id", 0))
         result["pi_update"] = latest.get("answer") or latest.get("text")
+    if harness_policy.enabled(brief) and (opening := _opening_event(conn, brief["run_id"])):
+        result["opening_survey_event"] = opening
     existing = receipt(conn, key)
     if existing:
         result.update(survey_event=existing["event_id"], surveyed_query=existing["arguments"],
@@ -150,10 +163,14 @@ def describe(conn, brief, prior, observed_inputs, *, catalog_sources=None):
 
 def required(conn, brief):
     survey = brief.get("catalog_discovery")
-    if survey and not receipt(conn, survey["state_key"]):
-        raise SchemaInvalid(INSTRUCTION, details={"reason": "CATALOG_SURVEY_REQUIRED",
-                                                 "field": "catalog_discovery",
-                                                 "state_key": survey["state_key"]})
+    if not survey:
+        return
+    opening_only = harness_policy.enabled(brief)
+    done = _opening_event(conn, brief["run_id"]) if opening_only else receipt(conn, survey["state_key"])
+    if not done:
+        raise SchemaInvalid(OPENING_INSTRUCTION if opening_only else INSTRUCTION,
+                            details={"reason": "CATALOG_SURVEY_REQUIRED", "field": "catalog_discovery",
+                                     "state_key": survey["state_key"]})
 
 
 def lead_query(conn, packet, arguments, identity, query):

@@ -14,7 +14,7 @@ PREFIX = "My requested action is "
 INTENT = {"change", "cancel_jobs", "confirm", "proposal", "supplement", "text"}
 READS = {"status", "inspect", "usage", "pending", "audit"}
 CONTROL = {"pause", "resume", "cancel", "retry", "recover"}
-KINDS = READS | CONTROL | {"budget_preview", "budget_apply", "usage_resolve"}
+KINDS = READS | CONTROL | {"sign_off", "budget_preview", "budget_apply", "usage_resolve"}
 
 
 def local_context(conn):
@@ -48,6 +48,9 @@ def _check(action):
         optional = {"reason"} if kind in CONTROL else set()
         if not intent._keys(action, {"kind"}, optional) or ("reason" in action and not intent._text(action["reason"])):
             raise SchemaInvalid("Unexpected operator action fields or empty reason")
+    elif kind == "sign_off":
+        if not intent._keys(action, {"kind", "decision_ref"}) or not intent._text(action["decision_ref"]):
+            raise SchemaInvalid("Sign the exact closed decision with --decision-ref")
     elif kind == "usage_resolve":
         from . import operator_usage
         operator_usage.check(action)
@@ -158,7 +161,7 @@ def _consume(ctx, rid, mid):
     row = _message(ctx.conn, mid)
     action = json.loads(row["action_json"])
     kind = _check(action)
-    if kind == "usage_resolve":
+    if kind in ("usage_resolve", "sign_off"):
         ctx = _submitted_context(ctx,rid,mid)
         authorized(ctx,rid)
     if row["rejected"]:
@@ -192,6 +195,9 @@ def _consume(ctx, rid, mid):
         if kind == "usage_resolve":
             from . import operator_usage
             result = operator_usage.perform(ctx,rid,mid,action,proof)
+        elif kind == "sign_off":
+            from . import research_closeout
+            result = research_closeout.signoff(ctx.conn, rid, action["decision_ref"], ctx.principal.subject)
         elif kind in INTENT:
             result = intent._apply_local(ctx.conn, rid, mid, action)
         elif kind in ("budget_preview", "budget_apply"):
@@ -277,6 +283,7 @@ def add_commands(commands):
     parser.add_argument("--run-id")
     parser.add_argument("--message-id", help="Stable ID for retrying this exact command")
     parser.add_argument("--reason")
+    parser.add_argument("--decision-ref", help="Final decision named in the PI signoff agreement")
     parser.add_argument("--resource", help="Budget resource, such as tokens or api_calls")
     parser.add_argument("--limit", type=float)
     parser.add_argument("--budget-scope", choices=("run", "project"))
@@ -302,8 +309,8 @@ def cli_action(args):
     action = {"kind": kind}
     for field in ("reason", "resource", "limit", "budget_scope", "preview_id", "preview_sha256",
                   "acknowledge_consequences","reservation_ref","decision","source","thread_id","turn_id",
-                  "response_id","acceptance_event_id","approve_release"):
-        value = getattr(args, field)
+                  "response_id","acceptance_event_id","approve_release","decision_ref"):
+        value = getattr(args, field, None)
         if value is not None:
             action[field] = int(value) if field == "limit" and value.is_integer() else value
     return action

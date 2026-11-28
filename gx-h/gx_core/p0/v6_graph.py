@@ -7,13 +7,14 @@ import json
 from .. import budgets, contracts, schema
 from ..domain import ids
 from ..errors import BudgetExceeded, SchemaInvalid, ScopeDenied
+from . import harness_policy, v6_routes
 
 
 def decision_schema():
     return contracts.native_goal_tool_spec("gx_decide_revision")["inputSchema"]["properties"]["decision"]
 
 
-def _shape(value, spec, *, measurement_branch=None, path="$", operation=None, variants=()):
+def _shape(value, spec, *, measurement_branch=None, path="$", operation=None, variants=(), budget_issues=None):
     def reject(reason, *, field=path, public_field=None, **details):
         prefix = f"{operation} at {field}" if operation else field
         details["field"] = field.removeprefix("$.")
@@ -43,7 +44,7 @@ def _shape(value, spec, *, measurement_branch=None, path="$", operation=None, va
             raise reject("Repeated decision reference or watch")
         for i, item in enumerate(value):
             _shape(item, spec["items"], measurement_branch=measurement_branch, path=f"{path}[{i}]",
-                   operation=operation)
+                   operation=operation, budget_issues=budget_issues)
     if "oneOf" in spec and not isinstance(value, dict):
         raise reject("Expected a graph operation object")
     if isinstance(value, dict):
@@ -52,36 +53,42 @@ def _shape(value, spec, *, measurement_branch=None, path="$", operation=None, va
                             if candidate["properties"]["op"]["const"] == value.get("op")), None)
             if not variant:
                 raise reject(f"Unknown graph operation {value.get('op')!r}", field=f"{path}.op")
-            # Only the private transport branch created for a single cheap measurement
-            # has no scientific hypothesis. An explicit opening uses the full contract.
+            # An implicit branch funds the probe Jobs. Explicit hypotheses still use the full contract.
             if (measurement_branch and value.get("branch") == measurement_branch and
                     value.get("op") == "open_branch" and set(value) == {"op", "branch", "budget_limits"}):
                 variant = dict(variant, required=["op", "branch", "budget_limits"])
             _shape(value, variant, measurement_branch=measurement_branch, path=path,
-                   operation=value["op"], variants=spec["oneOf"])
+                   operation=value["op"], variants=spec["oneOf"], budget_issues=budget_issues)
         for name, child in spec.get("properties", {}).items():
             if name in value:
                 _shape(value[name], child, measurement_branch=measurement_branch, path=f"{path}.{name}",
-                       operation=operation)
+                       operation=operation, budget_issues=budget_issues)
         if "propertyNames" in spec:
             allowed = spec["propertyNames"]["enum"]
             unknown = sorted(value.keys() - set(allowed))
             if unknown:
                 reason = f"Unknown branch budget unit(s) {', '.join(unknown)}. Allowed: {', '.join(allowed)}"
-                raise reject(reason, field=f"{path}.{unknown[0]}", public_field=path,
-                             unknown_units=unknown, allowed_units=allowed)
+                error = reject(reason, field=f"{path}.{unknown[0]}", public_field=path,
+                               unknown_units=unknown, allowed_units=allowed)
+                if budget_issues is None:
+                    raise error
+                budget_issues.append(error)
+                return
             try:
                 budgets.check_amounts(value, what="branch budget")
             except OverflowError as exc:
                 raise reject("Branch budget exceeds the supported numeric range") from exc
 
 
-def validate_body(decision, *, measurement_branch=None):
+def validate_body(decision, *, measurement_branch=None, lead_routes=False):
     try:
         json.dumps(decision, allow_nan=False)
     except (TypeError, ValueError, OverflowError) as exc:
         raise SchemaInvalid("Expected finite JSON decision values") from exc
-    _shape(decision, decision_schema(), measurement_branch=measurement_branch)
+    body = decision_schema()
+    if lead_routes:
+        body = v6_routes.with_operations(body)
+    _shape(decision, body, measurement_branch=measurement_branch)
     ops = decision["ops"]
     if any(not isinstance(op, dict) for op in ops):
         raise SchemaInvalid("Expected a graph operation object")
@@ -108,12 +115,12 @@ def require_cancellable(conn, run_id, node_id):
 def _aliases(operations, request_key):
     aliases = {}
     for op in operations:
-        target = {"open_branch": "branch", "add_node": "node"}.get(op["op"])
+        target = {"open_branch": "branch", "add_node": "node", "open_intent": "intent"}.get(op["op"])
         if not target:
             continue
         local = op[target]
         if not local.startswith("local:") or not local[6:].strip() or local in aliases:
-            raise SchemaInvalid("New nodes and branches require distinct local: names")
+            raise SchemaInvalid("New graph subjects require distinct local: names")
         aliases[local] = f"{target}_" + ids.sha256_of_obj([request_key, local])[:32]
     return aliases
 
@@ -139,6 +146,9 @@ def compile_graph(conn, request, previous, visible_refs, capabilities, *, module
     for index, source in enumerate(decision["ops"]):
         spec = dict(source)
         op = spec["op"]
+        if op in v6_routes.OPERATIONS:
+            resolved_ops.append(dict(source_index=index, op_digest=ids.sha256_of_obj(source), spec=spec))
+            continue
         for key in ("branch", "node"):
             if key in spec:
                 spec[key] = aliases.get(spec[key], spec[key])
@@ -174,6 +184,10 @@ def compile_graph(conn, request, previous, visible_refs, capabilities, *, module
                 raise ScopeDenied("Capability is outside the Run's pinned catalog", details={
                     "node": source["node"], "capability": spec["capability"],
                     "correction": "Select an allowed method before adding the node or choose an active method."})
+            if module is not None:
+                bound = json.loads(module["grant_json"]).get("local_bindings", {}).get(spec["capability"])
+                if bound is not None:
+                    spec["module_method_event"] = bound
             nodes[node] = dict(spec, state="ACTIVE")
         elif op == "stop_branch":
             if branch not in branches or branches[branch]["state"] != "OPEN":
@@ -188,6 +202,7 @@ def compile_graph(conn, request, previous, visible_refs, capabilities, *, module
             graph["closed"] = True
         resolved_ops.append(dict(source_index=index, op_digest=ids.sha256_of_obj(source), spec=spec))
 
+    v6_routes.compile_intents(conn, request, graph, resolved_ops, aliases)
     producers = {nid: entry["capability"] for nid, entry in nodes.items()}
     for item in resolved_ops:
         spec = item["spec"]
@@ -198,6 +213,10 @@ def compile_graph(conn, request, previous, visible_refs, capabilities, *, module
         for ref in spec["depends_on"]:
             if ref not in nodes:
                 raise SchemaInvalid("New dependency references an absent node")
+            if scope == "run" and branches[nodes[ref]["branch"]].get("module_instance_id") and (
+                    ref in spec["inputs"] or ref == spec.get("evidence_gate", {}).get("producer_node")):
+                if harness_policy.active(conn, run_id):
+                    raise ScopeDenied("Use the module's delivered artifact reference for this input or condition")
             if scope != "run" and nodes[ref]["branch"] != own_branch:
                 raise ScopeDenied("A branch may reuse granted artifacts; a cross-branch dependency requires the Lead")
         for index, ref in enumerate(spec["inputs"]):
@@ -239,12 +258,30 @@ def compile_graph(conn, request, previous, visible_refs, capabilities, *, module
             trigger = {"event": "job_settled", "subject_ref": node}
             if trigger not in watches:
                 watches.append(trigger)
+    if scope == "run":
+        for route in graph.get("intents", {}).values():
+            wake = route.get("wake_condition")
+            if (wake and route["phase"] == "OPEN" and route["goal_version"] == request["goal_version"]
+                    and wake not in watches):
+                watches.append(wake)
     subjects = {*branches, *nodes, *visible_refs, run_id, "run", "objective"}
     if scope != "run":
         subjects = {*visible_refs, own_branch, "run", run_id, "objective",
                     *(nid for nid, spec in nodes.items() if spec["branch"] == own_branch)}
-    for watch in watches:
+    for index, watch in enumerate(watches):
         subject = watch["subject_ref"]
+        if (watch["event"] == "job_settled" and subject not in subjects and subject in capabilities
+                and harness_policy.active(conn, run_id)):
+            # Resolve only Jobs commissioned in this validated submission. Older
+            # nodes and other modules' results are outside this shorthand.
+            local = [decision["ops"][row["source_index"]]["node"] for row in resolved_ops
+                     if row["spec"]["op"] == "add_node" and row["spec"]["capability"] == subject]
+            if len(local) > 1:
+                raise SchemaInvalid("Choose the submitted node whose Job should wake this decision", details={
+                    "field": f"reconsider_when[{index}].subject_ref", "reason": "watch_subject_ambiguous",
+                    "options": local})
+            if local:
+                watch["subject_ref"] = subject = aliases[local[0]]
         if watch["event"] == "module_report":
             from . import v62_maturity
             if scope != "run" or not v62_maturity.enrolled(conn, run_id):

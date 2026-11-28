@@ -96,8 +96,8 @@ def invoke(callback, *args, **kwargs):
         raise SchemaInvalid(str(exc)) from exc
 
 
-def dependencies(conn, run, capability, executable):
-    method = goal.method(conn, run, capability)
+def dependencies(conn, run, capability, executable, *, module_binding=None):
+    method = goal.method(conn, run, capability, module_binding=module_binding)
     if not method or not method.dependencies:
         return {}
 

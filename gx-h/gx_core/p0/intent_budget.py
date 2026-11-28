@@ -38,6 +38,8 @@ def limits_report(conn, run_id, items):
             row["metering"] = "GX limits new token reservations. Reported actual usage can exceed a reservation."
         elif resource == "api_calls":
             row["metering"] = "GX counts admitted calls. A native turn may issue multiple provider requests."
+        elif resource == "paid_api_calls":
+            row["metering"] = "GX books declared external call slots on adapter launch; invoices are separate."
         rows.append(row)
     return rows
 

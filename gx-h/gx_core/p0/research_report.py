@@ -206,6 +206,9 @@ def export(conn, rid, directory, invocation):
     result = {"schema":"gx.research-result/1", "run_id":rid, "goal":goal, "goal_status":"CLOSED",
               "goal_version":close["goal_version"], "closure":close, "final_decision":final,
               **science, "routes":work, "post_read_actions":actions, "rejected_decisions":rejected, "invocation":invocation}
+    from . import research_closeout
+    if pi_signature := research_closeout.signoff_status(conn, rid):
+        result["pi_signoff"] = pi_signature
     from adapters.scientific import publication_coverage
     coverage = publication_coverage.report(conn, rid)
     if coverage is not None:

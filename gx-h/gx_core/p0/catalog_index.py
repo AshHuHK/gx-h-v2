@@ -10,7 +10,7 @@ from ..artifacts import ArtifactService
 from ..capabilities import input_domain, manifest, shipped
 from ..errors import GxError, SchemaInvalid, ScopeDenied
 from ..plugins import goal, loader
-from . import capability_views, catalog_resources, intent, method_health, v62_catalog
+from . import capability_views, catalog_facts, catalog_resources, harness_policy, intent, method_health, module_methods, v62_catalog
 
 
 def installed_methods():
@@ -29,7 +29,7 @@ def _installed(root, directory, revisions):
     release = json.loads((directory / "workflow_packages.json").read_text())
     packages = loader.bootstrap(selected=[tuple(row["path"].split("/")) for row in release["plugins"]])
     unavailable = ["@".join(key) for key in packages.failures]
-    builtins = {c["capability_version"]: c for c in v62_catalog._release_method_cards(unavailable=unavailable)}
+    builtins = {c["capability_version"]: c for c in v62_catalog._release_method_cards(unavailable=unavailable, with_dependencies=True)}
     rows = []
     provided = set()
     for package in packages.plugins.values():
@@ -51,8 +51,10 @@ def _installed(root, directory, revisions):
                         "capability_version": cap, "portable_sha256": shipped.portable_digest(bundle),
                         "method": method["method_card"], "inputs": manifest.input_roles(method), "outputs": method["outputs"],
                         "limitations": method.get("limitations"), "applicable_domain": method.get("applicable_domain"),
-                        "cost_class": "gpu" if method["resources"].get("gpu") else "local_cpu",
+                        **manifest.cost_card(method["resources"]),
                     }, metric_contract=True)
+                    card["_dependencies"] = catalog_facts.dependencies(method)
+                    card["_deployment_files"] = [bundle[k]["path"] for k in ("entry_script", "parser") if bundle.get(k)]
                 except (GxError, KeyError, TypeError, ValueError, OSError):
                     unavailable.append(f"{provider} / {cap}")
                     continue
@@ -139,6 +141,7 @@ def _method_rows(conn, run_id, brief, inputs, active_rows):
     scope = brief["scope"]
     survey = False
     allowed = None
+    options = capability_views.goal_options(inputs) if scope == "run" else {}
     if scope != "run":
         from . import v62_modules
         record = v62_modules.require_active(conn, run_id, scope)
@@ -147,19 +150,27 @@ def _method_rows(conn, run_id, brief, inputs, active_rows):
             raise ScopeDenied("This module has no catalogue grant")
         survey = grant.get("catalog_access") == "public_methods"
         allowed = set(v62_catalog.effective_methods(conn, run_id, grant, methods=active_rows))
+        if harness_policy.enabled(inputs):
+            options = module_methods.options(conn, run_id, scope)
+            active_rows = [r for r in active_rows if r["capability_version"] in allowed]
+            local = module_methods.catalog(conn, run_id, scope)
+            active_rows.extend(local)
+            allowed.update(r["capability_version"] for r in local)
     def owner(row):
         provider = row.get("plugin", {})
         return provider["id"] + "@" + provider["version"] if provider else None
 
     active = {(row["capability_version"], row["portable_sha256"], owner(row)): row for row in active_rows}
+    opening = {(row["capability_version"], row["portable_sha256"], owner(row)): row
+               for row in inputs.get("capability_catalog", ())}
     cards = {(row["capability_version"], row["portable_sha256"], row["provider"]): row for row in installed_methods()}
     installed = set(cards)
     for key, row in active.items():
         if key not in cards:
             cards[key] = v62_catalog._public_card(row, metric_contract=True)
     variants = Counter((cap, digest) for cap, digest, _ in cards)
-    options = capability_views.goal_options(inputs)
     bans = intent.active_items(conn, run_id, intent.BAN_TYPES)
+    files = {}
     for (cap, digest, provider), card in cards.items():
         if intent.forbidden_capability(*cap.rsplit("@", 1), bans):
             continue
@@ -167,25 +178,39 @@ def _method_rows(conn, run_id, brief, inputs, active_rows):
         granted = key in active and (allowed is None or cap in allowed)
         present = key in installed and (not granted or not provider or
                                         active[key]["plugin"]["sha256"] == card.get("provider_sha256"))
-        if allowed is not None and not (granted or survey):
-            continue
+        if present and harness_policy.enabled(inputs):
+            paths = list(card.get("_deployment_files", ()))
+            if provider:
+                name, version = provider.rsplit("@", 1)
+                paths.append(f"plugins/installed/{name}/{version}/gx_plugin.json")
+            for path in paths:
+                if path not in files:
+                    files[path] = (config.HARNESS_ROOT / path).is_file()
+            present = all(files[p] for p in paths)
         opt = options.get(cap, {})
-        selectable = (scope == "run" and opt.get("digest") == digest and opt.get("provider", provider) == provider
+        selectable = (opt.get("digest") == digest and opt.get("provider", provider) == provider
                       and opt.get("provider_digest", card.get("provider_sha256")) == card.get("provider_sha256"))
+        if allowed is not None and not (granted or survey or selectable):
+            continue
         if granted:
             status = "available" if present else "pinned_deployment_missing"
+        elif selectable and not present:
+            status = "pinned_deployment_missing"
         elif selectable and not opt.get("provider") and variants[(cap, digest)] > 1:
             status = "needs_exact_provider"
         else:
             status = "selectable" if selectable else "catalog_only"
         # The public preview and exact card never expose paths, schemas, or evaluation payloads to survey modules.
-        detail = card
+        detail = {k: v for k, v in card.items() if not k.startswith("_")}
         if granted and scope == "run":
             detail = {k: v for k, v in active[key].items() if k not in ("content_artifact_ref", "provider_closure")}
         summary = v62_catalog._method_summary(card)
         row = {**card, "reference": cap, "kind": "method", "category": summary["category"], "purpose": summary["purpose"],
                "provider": provider, "digest": digest, "execution_granted": granted, "status": status,
                "installation_status": "installed" if present else "unavailable"}
+        row["_bound_manifest_digest"] = (active.get(key) or opening.get(key) or {}).get("manifest_sha256")
+        row["_bound_provider_digest"] = ((active[key].get("plugin") or {}).get("sha256") if granted
+                                         else card.get("provider_sha256"))
         row["_kinds"] = {"method"} | catalog_resources._method_kinds(card)
         row["_spec"] = detail
         yield row
@@ -268,7 +293,7 @@ def query(conn, run_id, brief, args, inputs):
                                                        include_references=False)
             rows.extend(dict(r, kind=resource_kind) for r in records)
     if kind in ("all", "module"):
-        modules = (inputs.get("research_catalog") or {}).get("modules", ())
+        modules = v62_catalog.module_choices(inputs.get("research_catalog") or {})
         for mod in modules:
             if scope == "run" or (mod["module_id"], mod["version"]) == (brief.get("module_id"), brief.get("module_version")):
                 rows.append({**v62_catalog._module_summary(mod), "reference": mod["module_id"] + "@" + mod["version"],
@@ -288,6 +313,18 @@ def query(conn, run_id, brief, args, inputs):
     visible_active = {r["reference"] for r in rows if r["kind"] == "method" and r["execution_granted"]}
     observations = (method_health.recent(conn, run_id, [m for m in active if m["capability_version"] in visible_active])
                     if scope == "run" else {})
+    current = harness_policy.enabled(inputs)
+    if current and observations:
+        # Redacted module nodes identify a Job, but its choice of method belongs to the
+        # researcher until evidence is shared. Avoid disclosing it via a health lookup.
+        redacted = {n["job_id"] for n in brief.get("nodes", ()) if n.get("job_id") and "commission" not in n}
+        observations = {cap: item for cap, item in observations.items() if item.get("job_id") not in redacted}
+    revision = {}
+    if current:
+        number = (capability_views.current(conn, run_id)["revision"] if scope == "run" else
+                  module_methods.revision(conn, run_id, scope))
+        revision = {"capability_revision": number}
+        envs = {}
     if reference := args.get("reference"):
         matches = [r for r in rows if r["reference"] == reference]
         if not matches:
@@ -304,7 +341,12 @@ def query(conn, run_id, brief, args, inputs):
                 spec["tools"] = [t for t in spec["tools"] if t in brief.get("allowed_tools", [])]
         else:
             spec = row.get("_spec", row)
-        return {"kind": row["kind"], "reference": reference, "spec": spec, "status": row["status"],
+        facts_view = {}
+        if current and (row["kind"] == "method" or row["status"] == "reference_only"):
+            seen = catalog_facts.executions(conn, run_id, brief, [reference])
+            facts_view["capability_facts"] = catalog_facts.project(conn, row, seen, envs)
+        return {**revision, **facts_view,
+                "kind": row["kind"], "reference": reference, "spec": spec, "status": row["status"],
                 "execution_granted": row.get("execution_granted", row["status"] == "available"), "provider": row.get("provider"),
                 **({"installation_status": row["installation_status"], "input_coverage": _input_status(row, materials, facts)}
                    if row["kind"] == "method" else {}),
@@ -347,11 +389,17 @@ def query(conn, run_id, brief, args, inputs):
         rank = (not exact, len(missing), domain_fit == "unsupported", -len(matches), scope_priority if words else 0,
                 -len(context_matches), scope_priority,
                 row["reference"], row.get("provider") or "")
-        results.append((rank, summary))
+        results.append((rank, summary, row))
     results.sort(key=lambda item: item[0])
     start = args.get("offset", 0)
     end = start + args.get("limit", 15)
-    response = {"kind": kind, "items": [item for _, item in results[start:end]], "total": len(results),
+    page = results[start:end]
+    if current:
+        seen = catalog_facts.executions(conn, run_id, brief, [item["reference"] for _, item, _ in page])
+        for _, item, row in page:
+            if row["kind"] == "method" or row["status"] == "reference_only":
+                item["capability_facts"] = catalog_facts.project(conn, row, seen, envs)
+    response = {**revision, "kind": kind, "items": [item for _, item, _ in page], "total": len(results),
                 "next_offset": end if end < len(results) else None}
     if unavailable_assets:
         response["unavailable_asset_metadata"] = unavailable_assets

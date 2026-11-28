@@ -16,6 +16,26 @@ HINT_SPEC = {
                         "operation_key": {"type": "string", "minLength": 1}}}}
 
 
+
+def hint_spec(brief):
+    from . import harness_policy
+    if not harness_policy.enabled(brief):
+        return HINT_SPEC
+    original = HINT_SPEC["inputSchema"]
+    properties = {**original["properties"],
+                  "action":{"type":"string","enum":["subscribe","publish","forward","correct","retract","history"]},
+                  "topic":{"type":"string","minLength":1,"maxLength":128},
+                  "question":{"type":"string","minLength":1,"maxLength":600},
+                  "interpretation":{"type":"string","minLength":1,"maxLength":600},
+                  "parent_hint_ids":{"type":"array","maxItems":8,"uniqueItems":True,"items":{"type":"string"}},
+                  "source_refs":{"type":"array","maxItems":8,"uniqueItems":True,"items":{"type":"string"}}}
+    return {**HINT_SPEC, "description":"Share a direct peer hint, or exchange research on a topic within this Goal. "
+            "Subscribe to see past and new findings. Publish a question, interpretation and/or original source refs. "
+            "For synthesis cite all parent_hint_ids. Forward, correct, retract or read revision history by parent_hint_ids. "
+            "gx_task_context returns available topics and unread changes. Interpretations require independent source checks.",
+            "inputSchema":{**original,"required":["operation_key"],"properties":properties}}
+
+
 def active(conn, run_id):
     return bool(conn.execute("SELECT 1 FROM runs WHERE run_id=? AND "
         "json_extract(inputs_json,'$.inputs.discovery_policy')='gx.catalog/1'", (run_id,)).fetchone())
@@ -95,20 +115,38 @@ def review_materials(conn, run_id, materials):
 
 
 def peers(conn, run_id, scope):
+    from . import harness_policy
+    modern = harness_policy.active(conn,run_id)
+    shared = " AND coalesce(json_extract(grant_json,'$.communication'),'shared')!='isolated'" if modern else ""
     rows = conn.execute("SELECT scope,module_id FROM v62_modules WHERE run_id=? AND status='OPEN' "
                         "AND scope!=? AND goal_version=(SELECT goal_version FROM v62_modules WHERE run_id=? AND scope=?) "
-                        "ORDER BY module_instance_id", (run_id, scope, run_id, scope))
+                        + shared + " ORDER BY module_instance_id", (run_id, scope, run_id, scope))
     return [dict(row) for row in rows]
 
 
 def inbox(conn, run_id, scope):
-    return [store.loads(row, "payload_json") for row in conn.execute(
+    rows = [store.loads(row, "payload_json") for row in conn.execute(
         "SELECT payload_json FROM events WHERE run_id=? AND kind='v62.module.peer_hint' AND subject_id=? "
         "ORDER BY event_id", (run_id, scope))]
+    from . import harness_policy, research_topics
+    if not rows or not harness_policy.active(conn,run_id):
+        return rows
+    member = conn.execute("SELECT * FROM v62_modules WHERE run_id=? AND scope=?",(run_id,scope)).fetchone()
+    if not member or research_topics.isolated(member):
+        return []
+    visible = research_topics.visible_refs(conn,member)
+    return [{k:v for k,v in message.items() if k != "visibility_refs"} for message in rows
+            if message["goal_version"] == member["goal_version"]
+            and set(message.get("visibility_refs",message["source_refs"])) <= visible]
 
 
 def send(conn, actor, args, native):
-    from . import pi_materials, v62_modules
+    from . import harness_policy, pi_materials, research_topics, v62_modules
+    modern = harness_policy.active(conn, actor["run_id"])
+    if modern and "action" in args:
+        return research_topics.send(conn,actor,args,native)
+    if modern and research_topics.isolated(actor):
+        raise ScopeDenied("An isolated research assignment cannot send peer hints")
     rid, src = actor["run_id"], actor["scope"]
     target = args.get("recipient_scope")
     text, refs = args.get("text"), args.get("source_refs")
@@ -118,7 +156,7 @@ def send(conn, actor, args, native):
         raise SchemaInvalid("A peer hint needs a recipient scope, short text and one to four shared originals")
     recipient = conn.execute("SELECT * FROM v62_modules WHERE run_id=? AND scope=? "
                              "AND status='OPEN' AND goal_version=?", (rid, target, actor["goal_version"])).fetchone()
-    if not recipient or target == src:
+    if not recipient or target == src or (modern and research_topics.isolated(recipient)):
         raise ScopeDenied("Select another open research module of this Run and Goal version")
     src_refs = set(v62_modules.visible_refs(conn, actor))
     dst_refs = set(v62_modules.visible_refs(conn, recipient))
@@ -126,6 +164,8 @@ def send(conn, actor, args, native):
         raise ScopeDenied("Peer hints require shared originals within the recipient's assignment")
     message = {"sender_scope": src, "recipient_scope": target, "text": text, "source_refs": refs,
                "author": {k: native[k] for k in ("threadId", "turnId", "callId")}, "goal_version": actor["goal_version"]}
+    if modern:
+        message["visibility_refs"] = sorted(set(refs) | (src_refs & pi_materials.private_originals(conn,rid)))
     eid = store.append_event(conn, run_id=rid, kind="v62.module.peer_hint", actor=native["threadId"],
                              subject_kind="module", subject_id=target, payload=message,
                              evidence_level="EXECUTION_OBSERVED")

@@ -8,7 +8,7 @@ from ..artifacts import ArtifactService, delivery
 from ..domain import clock, ids
 from ..errors import BudgetExceeded, IdempotencyConflict, SchemaInvalid, ScopeDenied, StaleRevision
 from ..persistence import store
-from . import intent, v6_graph, v62_graph
+from . import harness_policy, intent, v6_graph, v6_routes, v62_graph
 
 INSTANCE = "gx.v6.instance"
 decision_schema = v6_graph.decision_schema
@@ -214,8 +214,35 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
     if execution:
         from . import v624_operations, v62_native, v6_native
         wire = v62_native.evidence_tool(v6_native.DECIDE, v621_policy.VERSION)
-        v6_graph._shape(decision, wire["inputSchema"]["properties"]["decision"])
-        decision, implicit = v624_operations.normalize(conn, task, goal, decision, module=module)
+        wire_body = wire["inputSchema"]["properties"]["decision"]
+        updated = harness_policy.active(conn, run_id)
+        if updated:
+            decision = v624_operations.canonical_labels(decision)
+            from copy import deepcopy
+            wire_body = v6_routes.with_operations(wire_body) if task["scope"] == "run" else deepcopy(wire_body)
+            harness_policy.inferable_inputs(wire_body)
+        issues = [] if updated else None
+        v6_graph._shape(decision, wire_body, budget_issues=issues)
+        try:
+            decision, implicit = v624_operations.normalize(conn, task, goal, decision, module=module)
+        except ScopeDenied:
+            # An earlier wire failure is already sufficient. Do not enumerate choices outside this actor's scope.
+            if issues:
+                v624_operations.raise_choices(issues)
+            raise
+        except SchemaInvalid as exc:
+            if issues is None or exc.details.get("reason") not in {"selection_required", "branch_selection_required"}:
+                if issues:
+                    v624_operations.raise_choices(issues)
+                raise
+            issues.append(exc)
+        if issues:
+            if task["scope"] == "run":
+                from . import v624_comparison
+                delivered = v6_native.acknowledged_brief(conn, root, turn_id)
+                if delivered and (choice := v624_comparison.independent_choice(conn, task, decision, delivered[0])):
+                    issues.append(choice)
+            v624_operations.raise_choices(issues)
         if task["scope"] == "run":
             from . import v624_comparison
             metrics, received, selected = {}, {}, {}
@@ -226,7 +253,7 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
             delivered = v6_native.acknowledged_brief(conn, root, turn_id)
             decision = v624_comparison.normalize(conn, task, decision, metrics, received,
                                                  packet=delivered[0] if delivered else {})
-        v6_graph.validate_body(decision, measurement_branch=implicit)
+        v6_graph.validate_body(decision, measurement_branch=implicit, lead_routes=updated and task["scope"] == "run")
     else:
         v6_graph.validate_body(decision)
         if {"prediction", "reference_refs"}.intersection(decision.get("comparison_plan", {})):
@@ -277,6 +304,9 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
             raise ScopeDenied("This module's grant excludes graph decisions")
         from .v62_catalog import effective_methods
         allowed = set(allowed) & effective_methods(conn, run_id, grant)
+        if grant.get("local_bindings"):
+            from . import module_methods
+            allowed.update(row["capability_version"] for row in module_methods.catalog(conn, run_id, module["scope"]))
         config_pin = (module["grant_json"], module["snapshot_json"], module["budget_json"], cap_revision)
     caps = {op["capability"] for op in decision["ops"] if op["op"] == "add_node"}
     if any("@" not in cap for cap in caps):
@@ -350,6 +380,8 @@ def _apply_ops(conn, plan, decision_ref, module, decision_facts):
             store.append_event(conn, run_id=run_id, kind="v6.node.cancel_requested", actor=plan.thread_id,
                 subject_kind="node", subject_id=spec["node"], new_state="CANCEL_REQUESTED",
                 payload=dict(decision_id=decision_ref, op_digest=digest))
+        elif op in v6_routes.OPERATIONS:
+            v6_routes.record(conn, plan, item, decision_ref)
         elif op == "stop_branch":
             conn.execute("UPDATE v6_branches SET status='STOPPING',stop_decision_ref=?,stop_op_digest=? "
                          "WHERE run_id=? AND branch_id=?",
@@ -522,9 +554,14 @@ def commit(conn, plan):
             raise StaleRevision("The approved materials, scope or decision premises changed")
         if _capability_pins(conn, plan.capability_pins) != plan.capability_pins:
             raise StaleRevision("A capability approval or content pin changed before adoption")
+        v6_routes.recheck_bindings(conn, request, plan.resolved_ops)
         _check_bans(conn, run_id, plan.resolved_ops)
         if plan.funding_pin is not None and v6_graph.funding_pin(conn, run_id) != plan.funding_pin:
             raise StaleRevision("Funding changed while preparing the amendment; retry against the current ledger")
+        if close_context is not None:
+            from . import harness_policy, research_closeout
+            if harness_policy.active(conn, run_id) and (fact := research_closeout.maybe_prompt(conn, task, decision)):
+                return fact
         decision_ref, = delivery.register_manifest(ArtifactService(conn), plan.manifest, actor=plan.thread_id)
         from . import v62_rounds
         convergence = v62_rounds.adopt(conn, request, decision_ref, task)

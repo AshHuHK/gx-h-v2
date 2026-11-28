@@ -1,0 +1,75 @@
+test_ambiguous_upstream_and_sample_choices_return_together (acceptance.harness_refactor.probes.test_probes.Probes.test_ambiguous_upstream_and_sample_choices_return_together) ... ERROR
+test_single_material_and_method_revision_are_uniquely_bound (acceptance.harness_refactor.probes.test_probes.Probes.test_single_material_and_method_revision_are_uniquely_bound) ... ERROR
+test_two_steps_bind_real_output_and_charge_each_job_once (acceptance.harness_refactor.probes.test_probes.Probes.test_two_steps_bind_real_output_and_charge_each_job_once) ... ERROR
+
+======================================================================
+ERROR: test_ambiguous_upstream_and_sample_choices_return_together (acceptance.harness_refactor.probes.test_probes.Probes.test_ambiguous_upstream_and_sample_choices_return_together)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/probes/test_probes.py", line 111, in test_ambiguous_upstream_and_sample_choices_return_together
+    choices = {v["field"]:v["options"] for v in exc.exception.details["choices"]}
+                                                ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+KeyError: 'choices'
+
+======================================================================
+ERROR: test_single_material_and_method_revision_are_uniquely_bound (acceptance.harness_refactor.probes.test_probes.Probes.test_single_material_and_method_revision_are_uniquely_bound)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/probes/test_probes.py", line 120, in test_single_material_and_method_revision_are_uniquely_bound
+    result = s.call(s.lead, "gx_decide_revision", {"decision":{"rationale":"Find the initial reading.", "ops":[op]}}, "first")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/v62a/interleavings_fixture.py", line 198, in call
+    reply = self.roots._call(payload)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/roots.py", line 1137, in _call
+    return callback(self, p)
+           ^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_native.py", line 276, in call
+    return _call(roots, p)
+           ^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_native.py", line 374, in _call
+    prepared = v6_decisions.prepare(roots.conn, **identity, decision=args["decision"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_decisions.py", line 218, in prepare
+    decision, implicit = v624_operations.normalize(conn, task, goal, decision, module=module)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v624_operations.py", line 87, in normalize
+    minimum = _single_job_budget(conn, goal, jobs[0])
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v624_operations.py", line 38, in _single_job_budget
+    method, minimum = _job_requirements(conn, goal, node)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v624_operations.py", line 31, in _job_requirements
+    raise ScopeDenied("Capability is outside the Run's pinned catalog")
+gx_core.errors.ScopeDenied: SCOPE_DENIED: Capability is outside the Run's pinned catalog
+
+======================================================================
+ERROR: test_two_steps_bind_real_output_and_charge_each_job_once (acceptance.harness_refactor.probes.test_probes.Probes.test_two_steps_bind_real_output_and_charge_each_job_once)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/probes/test_probes.py", line 88, in test_two_steps_bind_real_output_and_charge_each_job_once
+    result = s.call(actor, "gx_decide_revision", {"decision": body}, "two-step")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/v62a/interleavings_fixture.py", line 198, in call
+    reply = self.roots._call(payload)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/roots.py", line 1137, in _call
+    return callback(self, p)
+           ^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_native.py", line 276, in call
+    return _call(roots, p)
+           ^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_native.py", line 374, in _call
+    prepared = v6_decisions.prepare(roots.conn, **identity, decision=args["decision"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_decisions.py", line 218, in prepare
+    decision, implicit = v624_operations.normalize(conn, task, goal, decision, module=module)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v624_operations.py", line 104, in normalize
+    raise _choice("ops[].branch", msg, candidates)
+gx_core.errors.SchemaInvalid: SCHEMA_INVALID: Open an explicit funded branch for this measurement. Include open_branch and add_node in the same ops list. Supply your hypothesis, method_family, alternative, discriminating_observation and stop_condition as text. Give the branch and node distinct local: names and use the branch name in add_node.branch. This Job requires budget_limits of at least {"cpu_seconds": 15, "job_submissions": 1}
+
+----------------------------------------------------------------------
+Ran 3 tests in 3.830s
+
+FAILED (errors=3)

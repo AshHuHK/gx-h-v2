@@ -249,10 +249,6 @@ class _StepTaken(Exception):
         self.job_id = job_id
 
 
-class _DryRun(Exception):
-    """Rolls back a transaction that only asked a question."""
-
-
 class JobService:
     """Submit, observe and settle jobs against one store."""
 
@@ -460,7 +456,10 @@ class JobService:
         run = conn.execute("SELECT run_id, status FROM runs WHERE run_id=?", (run_id,)).fetchone()
         if run is None:
             raise ArtifactNotFound(f"no run {run_id!r}", details={"run_id": run_id})
-        execution_manifest.check_capability(conn, run_id, request["capability_version"], review_probe=purpose == PURPOSE_PROBE)
+        from ..p0 import module_methods
+        local = module_methods.for_request(conn, request)
+        execution_manifest.check_capability(conn, run_id, request["capability_version"],
+                                            review_probe=purpose == PURPOSE_PROBE, module_binding=local)
         executable = contracts.states()["machines"]["run"]["executable"]
         if purpose != PURPOSE_PROBE and run["status"] not in executable:
             raise PhaseDenied(
@@ -494,7 +493,7 @@ class JobService:
 
             ladder.require_reviewed(conn, capability)
         else:
-            capability = registry.active_view(conn, capability, run_id=run_id)
+            capability = registry.active_view(conn, capability, run_id=run_id, module_binding=local)
         if purpose == PURPOSE_PATH:
             self._bind_to_plan(conn, request, capability, step_index)
         env = environments.require_ready(conn, capability["env_id"], actor=self.actor,
@@ -528,8 +527,7 @@ class JobService:
         from ..p0 import v62_budget
         budget_ref = v62_budget.job_funding(self.conn, request, budget_ref)
         self._refuse_prohibited_lines(self.conn, budget_ref=budget_ref, amounts=amounts)
-        self._budget_would_hold(budgets, run_id=request["run_id"], budget_ref=budget_ref,
-                                job_id=ids.new_id("job"), amounts=amounts)
+        budgets.check_job_room(self.conn, budget_ref, ids.new_id("job"), amounts)
         self._threads_or_refuse(self.conn, resources)
 
     def _admit(self, request: Mapping[str, Any], request_sha: str, key: str, *, reserved_job_id=None) -> sqlite3.Row:
@@ -627,7 +625,7 @@ class JobService:
             # one. It is held only in the transaction that writes the row: a submitter that dies
             # between the two leaves neither a hold nor a row (audit J9).
             self._refuse_prohibited_lines(conn, budget_ref=budget_ref, amounts=amounts)
-            self._budget_would_hold(budgets, run_id=run_id, budget_ref=budget_ref, job_id=job_id, amounts=amounts)
+            budgets.check_job_room(conn, budget_ref, job_id, amounts)
 
             preflight: dict[str, Any] = {}
             gpu = resources["gpu"]
@@ -697,11 +695,12 @@ class JobService:
             prepared = execution_manifest.prepare_runtime(intent, capability["bundle"], env, resources, preflight)
             v6_node = (request.get("binding") or {}).get("v6_node_id")
             if v6_node:
-                from ..p0 import v6_jobs, v6_method_context, v62_evidence
+                from ..p0 import module_methods, v6_jobs, v6_method_context, v62_evidence
                 gate_proof = v62_evidence.prepare_dispatch(conn, request)
                 required_data = v6_jobs._small_data_pins(manifest["required_data"]) if manifest.get("required_data") else {}
                 method_dependencies = v6_method_context.dependencies(
-                    conn, run_id, request["capability_version"], env["python_executable"])
+                    conn, run_id, request["capability_version"], env["python_executable"],
+                    module_binding=module_methods.for_request(conn, request))
             sample = capacity.sample_admission(conn)
             with store.transaction(conn, transaction_owner="JobService", operation="admit", run_id=run_id) as txn:
                 if reserved_job_id is not None:
@@ -905,27 +904,23 @@ class JobService:
             limits = store.loads(row, "limits_json", {}) or {}
             for line, needed in amounts.items():
                 if needed and line in limits and limits[line] == 0:
+                    child = conn.execute(
+                        "SELECT b.run_id FROM budget_reservations f JOIN budgets b ON b.budget_ref=f.budget_ref "
+                        "WHERE f.reservation_ref=? AND f.subject_kind='research_module'",
+                        ("fund:" + ref,)).fetchone() if ref == budget_ref and row["parent_ref"] else None
+                    from ..p0 import harness_policy
+                    if child and harness_policy.active(conn, child["run_id"]):
+                        # This is a delegated allotment. Check the PI's ancestor prohibitions
+                        # first, then let the ledger explain the child shortfall if applicable.
+                        continue
                     raise BudgetExceeded(
                         f"budget {ref} prohibits {line} (its limit is 0) and this job needs {needed} of it: "
                         "a prohibition, not a budget to wait for; lifting it is a change of the profile by a person",
                         details={"rule": "prohibited_line", "prohibited": True, "line": line, "limit": 0,
-                                 "needed": needed, "budget_ref": ref, "job_budget_ref": budget_ref})
+                                 "needed": needed, "budget_ref": ref, "job_budget_ref": budget_ref,
+                                 "shortfalls": [{"key": line, "limit": 0, "requested": needed, "available": 0,
+                                                 "short_by": needed}], "held_reservations": []})
             ref = row["parent_ref"]
-
-    def _budget_would_hold(self, budgets: Any, *, run_id: str, budget_ref: str, job_id: str,
-                           amounts: Mapping[str, Any]) -> None:
-        """Ask the budget whether it would hold ``amounts`` now, holding nothing: the same
-        ``reserve`` as admission makes, in a transaction that is rolled back. BUDGET_EXCEEDED
-        is raised exactly as reserve() raises it."""
-        try:
-            with store.transaction(
-                self.conn, transaction_owner="JobService", operation="probe_budget", run_id=run_id,
-            ) as txn:
-                budgets.reserve(txn, budget_ref=budget_ref, subject_kind="job", subject_id=job_id,
-                                amounts=amounts, actor=self.actor)
-                raise _DryRun
-        except _DryRun:
-            pass
 
     def _check_limits(self, resources: Mapping[str, Any]) -> None:
         """The figures a job may have at all, from ``config/limits.json`` read now: the first
@@ -939,6 +934,8 @@ class JobService:
     def _budget_amounts(resources: Mapping[str, Any]) -> dict[str, int]:
         amounts = {"job_submissions": 1,
                    "cpu_seconds": int(resources["wall_seconds"]) * int(resources["cpu_threads"])}
+        if resources.get("paid_api_calls"):
+            amounts["paid_api_calls"] = resources["paid_api_calls"]
         if resources["gpu"] is not None:
             amounts["gpu_jobs"] = 1
             amounts["gpu_minutes"] = math.ceil(int(resources["wall_seconds"]) / 60)
@@ -1035,6 +1032,13 @@ class JobService:
         resources = store.loads(row, "resources_json", {}) or {}
         intent = store.loads(row, "submit_intent_json", {}) or {}
         job = self._paths(job_id)
+
+        if resources.get("paid_api_calls"):
+            try:
+                config.require_switch("paid_external_services")
+            except ApprovalRequired as exc:
+                self._fail_unstarted(row, exc.message, failure_class="resource", because="switch")
+                raise self._named(exc, job_id) from None
 
         if resources.get("gpu") is not None:
             try:
@@ -2346,6 +2350,10 @@ class JobService:
             wall = limit if outcome.get("wall_seconds") is None else min(wall, limit)
             cpu = wall * int(resources.get("cpu_threads") or 1)
         actual = {"job_submissions": 1, "cpu_seconds": math.ceil(cpu) if started else 0}
+        # Reserve and consume fixed outbound *call slots* per launched adapter. This
+        # is a PI-set exposure bound, not a provider invoice or a measured request count.
+        if resources.get("paid_api_calls"):
+            actual["paid_api_calls"] = resources["paid_api_calls"] if outcome.get("started") is not False else 0
         if resources.get("gpu") is not None:
             actual["gpu_jobs"] = 1 if started else 0
             actual["gpu_minutes"] = max(1, math.ceil(wall / 60)) if started else 0

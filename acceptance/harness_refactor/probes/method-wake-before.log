@@ -1,0 +1,43 @@
+test_ambiguity_offers_only_this_drafts_labels_and_cannot_watch_a_blind_peer (acceptance.harness_refactor.probes.test_method_wake.MethodWake.test_ambiguity_offers_only_this_drafts_labels_and_cannot_watch_a_blind_peer) ... ERROR
+test_historical_wire_leaves_method_names_as_literal_subjects (acceptance.harness_refactor.probes.test_method_wake.MethodWake.test_historical_wire_leaves_method_names_as_literal_subjects) ... ok
+test_new_measurement_wakes_its_own_module_after_real_cpu_settlement (acceptance.harness_refactor.probes.test_method_wake.MethodWake.test_new_measurement_wakes_its_own_module_after_real_cpu_settlement) ... ERROR
+
+======================================================================
+ERROR: test_ambiguity_offers_only_this_drafts_labels_and_cannot_watch_a_blind_peer (acceptance.harness_refactor.probes.test_method_wake.MethodWake.test_ambiguity_offers_only_this_drafts_labels_and_cannot_watch_a_blind_peer)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/probes/test_method_wake.py", line 50, in test_ambiguity_offers_only_this_drafts_labels_and_cannot_watch_a_blind_peer
+    self.assertEqual(ambiguous.exception.details["field"], "reconsider_when[0].subject_ref")
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+KeyError: 'field'
+
+======================================================================
+ERROR: test_new_measurement_wakes_its_own_module_after_real_cpu_settlement (acceptance.harness_refactor.probes.test_method_wake.MethodWake.test_new_measurement_wakes_its_own_module_after_real_cpu_settlement)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/harness_refactor/probes/test_method_wake.py", line 26, in test_new_measurement_wakes_its_own_module_after_real_cpu_settlement
+    accepted = s.call(actor, "gx_decide_revision", args, "bind-wake")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/acceptance/v62a/interleavings_fixture.py", line 198, in call
+    reply = self.roots._call(payload)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/roots.py", line 1143, in _call
+    return callback(self, p)
+           ^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_native.py", line 341, in call
+    return _call(roots, p)
+           ^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_native.py", line 441, in _call
+    prepared = v6_decisions.prepare(roots.conn, **identity, decision=args["decision"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_decisions.py", line 316, in prepare
+    graph, ops, aliases, watches = v6_graph.compile_graph(conn, request, previous, refs,
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/inspire/ssd/tenant_predefaa-9a1b-4522-bb10-8850f313be13/global_public/ash_proj/gx-auto/gx-v-6/product-multi-workflow/gx-h/gx_core/p0/v6_graph.py", line 284, in compile_graph
+    raise SchemaInvalid(f"Watch subject is outside the current graph and visible evidence: {subject}")
+gx_core.errors.SchemaInvalid: SCHEMA_INVALID: Watch subject is outside the current graph and visible evidence: instrument-series@1
+
+----------------------------------------------------------------------
+Ran 3 tests in 3.795s
+
+FAILED (errors=2)

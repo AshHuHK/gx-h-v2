@@ -256,8 +256,6 @@ class _ResearchModules(_Registrar):
                 raise ValueError(f"{name} contains duplicate values")
         if not focuses or not efforts or set(efforts) - {"medium", "deep"}:
             raise ValueError("a research module needs a focus and at least one supported effort")
-        if "medium" in efforts and set(focuses) - {"data", "model", "workflow", "evaluation"}:
-            raise ValueError("medium supports data, model, workflow and evaluation inventory")
         for capability in capabilities:
             _parse_capability_version(capability)
         if catalog_access not in ("assigned", "public_methods"):

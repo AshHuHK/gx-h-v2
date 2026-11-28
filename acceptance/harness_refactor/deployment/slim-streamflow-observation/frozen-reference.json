@@ -1,0 +1,67 @@
+{
+  "frozen_utc": "2026-11-28T00:07:25.187376+00:00",
+  "provider": "official OpenAI Codex using existing ChatGPT subscription only",
+  "additional_payment_authorized": 0,
+  "original": {
+    "kind": "USGS NWIS daily mean discharge",
+    "site": "01651000",
+    "raw_source": "acceptance/harness_refactor/field/hydro/a/usgs.json",
+    "retrieval_url": "http://waterservices.usgs.gov/nwis/dv/format=json&sites=01646500,01651000&parameterCd=00060&startDT=2023-04-01&endDT=2023-04-03&statCd=00003&siteStatus=all",
+    "sha256": "03c1879879b8c2fdff492ae438cc0c3f3f968d186f30b6c30db533b44a7bd336",
+    "bytes": 4535,
+    "unit": "ft3/s"
+  },
+  "goal_sha256": "00afe55600210bc31bc21e2917fdb59fd323e968e749cff9e15dea3e50ecc4b8",
+  "config_sha256": "3bc74fe63b772bb8434e361435d80bdd8217ccf98aa775bf64cd845859bb8f9d",
+  "checks": {
+    "pairs": [
+      {
+        "dates": [
+          "2023-04-01",
+          "2023-04-02"
+        ],
+        "readings": [
+          "60.9",
+          "40.7"
+        ],
+        "change": "-20.2"
+      },
+      {
+        "dates": [
+          "2023-04-02",
+          "2023-04-03"
+        ],
+        "readings": [
+          "40.7",
+          "25.9"
+        ],
+        "change": "-14.8"
+      }
+    ],
+    "maximum_absolute_change": {
+      "dates": [
+        "2023-04-01",
+        "2023-04-02"
+      ],
+      "readings": [
+        "60.9",
+        "40.7"
+      ],
+      "change": "-20.2"
+    },
+    "qualifiers": [
+      [
+        "A"
+      ],
+      [
+        "A"
+      ],
+      [
+        "A"
+      ]
+    ],
+    "trend_scope": "Three daily means describe this window; longer-term station trends are untested.",
+    "evidence": "GX input delivery and actual Lead read, accepted scientific conclusion on the same ordinary Run.",
+    "optional_jobs": "Reported as observed; direct Lead reading suffices for this numerical question."
+  }
+}

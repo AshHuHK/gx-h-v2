@@ -118,7 +118,7 @@ def deliver(conn, brief, limit):
     the authorized packet, including all of its released results. Its content digest
     makes concurrent preparation/retry converge on the same bytes.
     """
-    from .v6_native import PREFIX
+    from .v6_native import PREFIX, has_open_branch, has_recipe_source
     room = limit - len(PREFIX.encode("utf-8"))
     if _size(brief) <= room:
         return brief, brief
@@ -133,7 +133,9 @@ def deliver(conn, brief, limit):
     full = {**brief, "full_brief_ref": ref, "evidence_refs": list(dict.fromkeys([*brief["evidence_refs"], ref]))}
     packet = {k: brief[k] for k in ("run_id", "scope", "goal_version", "head", "research_effort")}
     if survey := brief.get("catalog_discovery"):
-        packet["catalog_discovery"] = {k: survey[k] for k in ("state_key", "through_event", "survey_event") if k in survey}
+        packet["catalog_discovery"] = {k: survey[k] for k in ("state_key", "through_event", "survey_event", "opening_survey_event") if k in survey}
+    if brief.get("ad_hoc_delegation"):
+        packet["ad_hoc_delegation"] = True
     if "capability_view" in brief:
         packet["capability_view"] = brief["capability_view"]
     if brief.get("branch_delegation") is False:
@@ -152,12 +154,26 @@ def deliver(conn, brief, limit):
         prior = brief["prior_research"]
         packet["prior_research"] = {k: prior[k] for k in (
             "parent_run_id", "parent_decision_ref", "parent_goal_version", "evidence_status")}
+    if brief.get("core_materials"):
+        packet["core_material_count"] = len(brief["core_materials"])
+    if brief.get("research_topic_findings"):
+        packet["research_topic_findings_available"] = len(brief["research_topic_findings"])
+    if brief.get("research_joins"):
+        packet["research_joins_available"] = len(brief["research_joins"])
     if brief.get("recipe_decisions"):
         packet["recipe_decisions_available"] = len(brief["recipe_decisions"])
     if "prospective_opening" in brief:
         packet["prospective_opening"] = brief["prospective_opening"]
     if "report_presentation" in brief:
         packet["report_presentation"] = brief["report_presentation"]
+    if "harness_policy" in brief:
+        packet["harness_policy"] = brief["harness_policy"]
+        from . import harness_policy
+        if harness_policy.enabled(brief):
+            if has_recipe_source(brief, True):
+                packet["recipe_source_available"] = True
+            if brief.get("branch_delegation", True) and has_open_branch(brief, True):
+                packet["open_branch_available"] = True
     if "study_class" in brief:
         packet["study_class"] = brief["study_class"]
     if "evidence_policy" in brief:
@@ -177,6 +193,18 @@ def deliver(conn, brief, limit):
         rows = [c for c in brief["trigger"]["changes"] if c["event_id"] > refresh["after_cursor"]
                 and c["event"] != "v6.decision.superseded"]
         trigger.update(refresh=refresh, changes=[], refresh_change_count=len(rows))
+    # Reserve headers before any variable-length content is fitted. Opening a
+    # new empty section on a full packet can itself exceed the native limit.
+    for section in ("core_materials", "research_joins", "research_topic_findings", "recipe_decisions", "research_intents",
+                    "pi_dialogue", "comparisons"):
+        if brief.get(section):
+            packet[section] = []
+    if brief.get("research_intents"):
+        packet["research_intent_count"] = len(brief["research_intents"])
+    report_index = brief.get("module_report_index", [])
+    adverse_count = sum(bool(entry.get("counterevidence")) for entry in report_index)
+    if adverse_count:
+        packet["reports_with_counterevidence"] = adverse_count
     if _size(packet) > room:
         packet["budget"] = {"initial_job_limit": brief["budget"]["initial_job_limit"]} if "initial_job_limit" in brief["budget"] else {}
     # JSON escaping can expand the goal beyond its UTF-8 excerpt size.
@@ -189,12 +217,6 @@ def deliver(conn, brief, limit):
             return True
         owner[key].pop()
         return False
-
-    if brief.get("recipe_decisions"):
-        packet["recipe_decisions"] = []
-        for point in reversed(brief["recipe_decisions"]):
-            if not append("recipe_decisions", point):
-                break
 
     if survey := brief.get("catalog_discovery"):
         preview = packet["catalog_discovery"]
@@ -225,7 +247,6 @@ def deliver(conn, brief, limit):
         trigger["changes"].reverse()
 
     if brief.get("pi_dialogue"):
-        packet["pi_dialogue"] = []
         for item in reversed(brief["pi_dialogue"]):
             if not append("pi_dialogue", item):
                 break
@@ -237,7 +258,6 @@ def deliver(conn, brief, limit):
         if node.get("failure") and node["node_id"] in recent_failures:
             if append("nodes", {k: node[k] for k in ("node_id", "job_id", "branch_id", "status", "failure")}):
                 shown_failures.add(node["node_id"])
-    report_index = brief.get("module_report_index", [])
     previews = {entry["report_ref"]: entry for entry in brief.get("module_reports", [])}
     adverse = [{**previews.get(entry["report_ref"], {}), **entry,
                 **({"pending_endpoints": previews[entry["report_ref"]].get("pending_endpoints", True)}
@@ -248,11 +268,8 @@ def deliver(conn, brief, limit):
     from . import v621_policy, v623_endpoints as endpoints
     active = brief.get("evidence_policy") in v621_policy.LIVE_SCIENCE
     placed = {}
-    if adverse:
-        packet["reports_with_counterevidence"] = len(adverse)
     if active:
         if brief.get("comparisons"):
-            packet["comparisons"] = []
             for item in reversed(brief["comparisons"]):
                 if not append("comparisons", {k:item[k] for k in ("comparison_id", "branch") if k in item}):
                     break
@@ -337,6 +354,34 @@ def deliver(conn, brief, limit):
                 allowance -= _size(item) + 1
                 if allowance < 0 or not append(key, item, owner=projected):
                     break
+    if brief.get("research_joins"):
+        for row in reversed(brief["research_joins"]):
+            summary = {k: row[k] for k in ("key", "state", "question", "outcome_event")}
+            if row.get("outcome"):
+                summary.update({k: row["outcome"][k] for k in ("needed", "satisfied_count", "still_possible_count")})
+            if not append("research_joins", summary):
+                break
+    for item in brief.get("core_materials", []):
+        if not append("core_materials", {"question":item["question"], "ref":item["ref"]}):
+            break
+    if brief.get("recipe_decisions"):
+        for point in reversed(brief["recipe_decisions"]):
+            if not append("recipe_decisions", point):
+                break
+
+    if findings := brief.get("research_topic_findings"):
+        for finding in reversed(findings):
+            if not append("research_topic_findings", finding):
+                break
+    if brief.get("research_intents"):
+        allowance = room // 6
+        for route in brief["research_intents"]:
+            summary = {key: route[key] for key in ("intent", "revision", "phase", "binding_state")}
+            summary["question"] = _excerpt(route["question"], 100)
+            allowance -= _size(summary)
+            if allowance < 0 or not append("research_intents", summary):
+                break
+
     for key in ("module_catalog", "materials", "capabilities", "branches", "nodes", "claims", "observations"):
         for item in brief.get(key, []):
             if key == "nodes" and item.get("node_id") in shown_failures:

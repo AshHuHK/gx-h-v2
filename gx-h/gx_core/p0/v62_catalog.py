@@ -27,16 +27,19 @@ def _policy(spec):
     effort = spec.get("research_effort", "quick")
     if not isinstance(effort, str) or effort not in _EFFORT:
         raise SchemaInvalid("research_effort must be quick, medium or deep")
-    parallel, rounds = _EFFORT[effort]
+    from . import harness_policy
+    autonomous = harness_policy.enabled(spec)
+    parallel, rounds = (1, 1) if effort == "quick" and autonomous else _EFFORT[effort]
     overrides = spec.get("module_policy", {})
     if not isinstance(overrides, dict) or overrides.keys() - _MINIMUM.keys():
         raise SchemaInvalid("Unknown research module policy")
     for key, value in overrides.items():
         if type(value) is not int or value < _MINIMUM[key]:
             raise SchemaInvalid(f"module_policy.{key} needs an integer >= {_MINIMUM[key]}")
-    if effort == "quick" and (overrides or spec.get("research_modules")):
+    if effort == "quick" and (overrides or spec.get("research_modules")) and not autonomous:
         raise SchemaInvalid("Select medium or deep effort to delegate research modules")
-    return {"effort": effort, "max_parallel": parallel, "max_rounds": rounds, **_DEFAULTS, **overrides}
+    return {"effort": effort, "max_parallel": parallel, "max_rounds": rounds, **_DEFAULTS, **overrides,
+            **({"explicit_round_limit": True} if autonomous and "max_rounds" in overrides else {})}
 
 
 def _declaration(plugin, key):
@@ -46,16 +49,22 @@ def _declaration(plugin, key):
 
 def for_start(spec):
     """Freeze the discovered declaration and its exact installation closure before opening a Run."""
+    from . import harness_policy
+    autonomous = harness_policy.enabled(spec)
     settings = _policy(spec)
     branch_delegation = spec.get("branch_delegation", True)
-    if type(branch_delegation) is not bool or (not branch_delegation and settings["effort"] == "quick"):
+    if type(branch_delegation) is not bool or (not autonomous and not branch_delegation and settings["effort"] == "quick"):
         raise SchemaInvalid("branch_delegation must be boolean; a restricted delegation grant needs medium or deep effort")
     requested = spec.get("research_modules")
     if requested is not None and (not isinstance(requested, list)
             or any(not isinstance(k, str) or k.count("@") != 1 for k in requested)
             or len(set(requested)) != len(requested)):
         raise SchemaInvalid("research_modules must list distinct module_id@version references")
-    if settings["effort"] == "quick":
+    if settings["effort"] == "quick" and not settings["max_parallel"]:
+        if autonomous:
+            from .v62_sources import TOOL_NAMES
+            return {"policy": settings, "modules": [], "source_tools": sorted(TOOL_NAMES),
+                    **({"branch_delegation": False} if not branch_delegation else {})}
         return None
     if not spec.get("historical_replay"):
         settings["stagnation_policy"] = "advisory"
@@ -79,13 +88,16 @@ def for_start(spec):
                 continue
             if (requested is None or reference in requested) and settings["effort"] in definition["efforts"]:
                 candidates.setdefault(key, []).append(plugin)
+    ad_hoc = autonomous and settings["max_parallel"] > 0 and (requested is None or "ad_hoc@1" in requested)
     missing = set(requested or ()) - {"@".join(key) for key in candidates}
+    if ad_hoc:
+        missing.discard("ad_hoc@1")
     if missing:
         raise SchemaInvalid(f"Unavailable research module grants for {settings['effort']}: {sorted(missing)}")
     modules = []
     deep = settings["effort"] == "deep"
     independent_science_access = deep and version in v621_policy.GOVERNED
-    lead_source_tools = set(TOOL_NAMES) if independent_science_access else set()
+    lead_source_tools = set(TOOL_NAMES) if independent_science_access or autonomous else set()
     survey = False
     for key, owners in sorted(candidates.items()):
         selected = [p for p in owners if (p.pin.id, p.pin.version) in preferred] or owners
@@ -104,6 +116,7 @@ def for_start(spec):
     discovery = spec.get("discovery_policy") == capability_views.DISCOVERY_POLICY
     choices = _choice_cards(loaded, options) if options and not discovery else []
     return {"policy": settings, "modules": modules,
+            **({"ad_hoc_delegation": True, "ad_hoc_declaration": _ad_hoc_definition()} if ad_hoc else {}),
             **({"choices": choices} if choices else {}),
             **({"branch_delegation": False} if not branch_delegation else {}),
             **({"source_tools": sorted(lead_source_tools)} if lead_source_tools else {}),
@@ -112,7 +125,7 @@ def for_start(spec):
                if independent_science_access or survey else {})}
 
 
-def _release_method_card(cap, declaration):
+def _release_method_card(cap, declaration, *, with_dependencies=False):
     bundle = json.loads(declaration.read_bytes())
     if not isinstance(bundle, dict) or not isinstance(bundle.get("manifest"), dict):
         raise VersionImmutable("The public method has no declared manifest")
@@ -128,12 +141,18 @@ def _release_method_card(cap, declaration):
         raise SchemaInvalid("; ".join(found))
     if shipped.pin(cap) != pin or manifest.capability_version(method) != cap:
         raise VersionImmutable("The public method metadata differs from the registered release")
-    return _public_card({"capability_version": cap, "portable_sha256": pin, "applicable_domain": method.get("applicable_domain"),
+    card = _public_card({"capability_version": cap, "portable_sha256": pin, "applicable_domain": method.get("applicable_domain"),
         "method": method["method_card"], "inputs": manifest.input_roles(method), "outputs": method["outputs"],
-        "limitations": method.get("limitations"), "cost_class": "gpu" if method["resources"].get("gpu") else "local_cpu"})
+        "limitations": method.get("limitations"), **manifest.cost_card(method["resources"])})
+
+    if with_dependencies:
+        from . import catalog_facts
+        card["_dependencies"] = catalog_facts.dependencies(method)
+        card["_profile_outputs"] = method["outputs"]
+    return card
 
 
-def _release_method_cards(*, unavailable=None):
+def _release_method_cards(*, unavailable=None, with_dependencies=False):
     """Keep each unverified method out of the public discovery index."""
     cards = []
     for cap, path in sorted(shipped.MANIFESTS.items()):
@@ -143,7 +162,7 @@ def _release_method_cards(*, unavailable=None):
                 unavailable.append(cap)
             continue
         try:
-            cards.append(_release_method_card(cap, declaration))
+            cards.append(_release_method_card(cap, declaration, with_dependencies=with_dependencies))
         except (GxError, ValueError, OSError, KeyError, TypeError):
             if unavailable is None:
                 raise
@@ -169,7 +188,7 @@ def _choice_cards(loaded, options):
             cards[cap] = _public_card({
                 "capability_version":cap, "portable_sha256":digest, "method":method["method_card"], "applicable_domain":method.get("applicable_domain"),
                 "inputs":manifest.input_roles(method), "outputs":method["outputs"], "limitations":method.get("limitations"),
-                "cost_class":"gpu" if method["resources"].get("gpu") else "local_cpu"})
+                **manifest.cost_card(method["resources"])})
     return [dict(card, status="selectable") for cap, card in sorted(cards.items())
             if card["portable_sha256"] == options[cap]["digest"]]
 
@@ -185,6 +204,8 @@ def _public_card(row, *, metric_contract=False):
                   if isinstance(method.get(key), str)}
     card = {key: row[key] for key in ("capability_version", "portable_sha256", "family", "cost_class", "limitations")
             if isinstance(row.get(key), str)}
+    if type(row.get("paid_api_calls")) is int and row["paid_api_calls"] > 0:
+        card["paid_api_calls"] = row["paid_api_calls"]
     card["method"] = method if isinstance(method, (dict, str)) else {}
     if "method" in domains:
         card["method"]["applicable_domain"] = domains["method"]
@@ -290,7 +311,7 @@ def _fits_profile(method, profiles):
     inputs = set(method.get("inputs", ()))
     card = method.get("method")
     family = method.get("family") or (card.get("family") if isinstance(card, dict) else None)
-    for output in method.get("outputs", ()):
+    for output in method.get("_profile_outputs", method.get("outputs", ())):
         if not isinstance(output, dict):
             continue
         for profile in profiles:
@@ -307,10 +328,36 @@ def _fits_profile(method, profiles):
     return False
 
 
+def _ad_hoc_definition():
+    from .v62_sources import TOOL_NAMES
+    definition = {
+        "module_id": "ad_hoc", "version": "1",
+        "purpose": "A researcher commissioned for the Lead's specific question",
+        "output": "A signed scientific report with sources, observations and unresolved questions",
+        "cost_class": "delegated", "focuses": ["research"],
+        "instructions": "Investigate the assigned question, read the original sources and decide what "
+                        "measurements would distinguish the alternatives. Report the evidence and its limits.",
+        "input_roles": ["*"], "catalog_access": "public_methods",
+        "tools": ["gx_task_context", "gx_query_catalog", "gx_read_artifact", *TOOL_NAMES,
+                  "gx_decide_revision", "gx_submit_module_report", "gx_select_capability"],
+    }
+    return {**definition, "plugin": None, "declaration_sha256": ids.sha256_of_obj(definition)}
+
+
+def module_choices(catalog):
+    modules = list(catalog.get("modules", ()))
+    if catalog.get("ad_hoc_delegation"):
+        modules.append(catalog["ad_hoc_declaration"])
+    return modules
+
+
 def resolve(conn, run_id, module_id, version):
     """A module's effective methods are intersected again with the individual delegation by its owner."""
     inputs = _inputs(conn, run_id)
-    for row in (inputs.get("research_catalog") or {}).get("modules", []):
+    catalog = inputs.get("research_catalog") or {}
+    if (module_id, version) == ("ad_hoc", "1") and catalog.get("ad_hoc_delegation"):
+        return {**catalog["ad_hoc_declaration"], "capabilities": [m["capability_version"] for m in _methods(conn, run_id, inputs)]}
+    for row in catalog.get("modules", []):
         if (row["module_id"], row["version"]) != (module_id, version):
             continue
         owner = goal._pin(row["plugin"])
@@ -327,7 +374,8 @@ def resolve(conn, run_id, module_id, version):
         else:
             granted = {method["capability_version"] for method in methods}
             allowed = [c for c in declaration["capabilities"] if c in granted]
-        return {**row, **declaration, "capabilities": allowed}
+        return {**row, **declaration, "capabilities": allowed,
+                **({"declared_capabilities": declaration["capabilities"]} if "harness_policy" in inputs else {})}
     raise ScopeDenied(f"Research module {module_id}@{version} is outside this Run's effort or grant")
 
 
@@ -357,7 +405,8 @@ def _method_summary(row):
     return {"capability_version": row["capability_version"],
             "category": row.get("family", card.get("family", "uncategorized")),
             "purpose": method if isinstance(method, str) else card.get("objective", ""),
-            "cost_class": row.get("cost_class", "unspecified"), "outputs": outputs}
+            "cost_class": row.get("cost_class", "unspecified"), "outputs": outputs,
+            **({"paid_api_calls": row["paid_api_calls"]} if row.get("paid_api_calls") else {})}
 
 
 def _catalog_view(rows, settings, categories_for):
@@ -389,10 +438,11 @@ def project(conn, run_id, brief):
     settings = catalog["policy"]
     methods, view = _catalog_view([_method_summary(row) for row in _methods(conn, run_id, inputs)],
                                   settings, lambda row: [row["category"]])
-    modules, module_view = _catalog_view([_module_summary(r) for r in catalog["modules"]],
+    modules, module_view = _catalog_view([_module_summary(r) for r in module_choices(catalog)],
                                          settings, lambda row: row["focuses"])
     return {**brief, "capabilities": methods, "catalog_view": view, "research_effort": settings["effort"],
             "module_catalog": modules,
+            **({"ad_hoc_delegation": True} if catalog.get("ad_hoc_delegation") else {}),
             **({"branch_delegation": False} if catalog.get("branch_delegation") is False else {}),
             **({"module_catalog_view": module_view, "module_catalog_available": True}
                if module_view["mode"] == "categories" else {}),
@@ -479,7 +529,7 @@ def query(conn, run_id, brief, args):
                 item["execution_granted"] = cap in granted
                 item["status"] = "available" if cap in granted else cards[cap].get("status", "catalog_only")
     else:
-        rows = catalog["modules"]
+        rows = module_choices(catalog)
         if module_scope:
             rows = [r for r in rows if (r["module_id"], r["version"]) ==
                     (brief.get("module_id"), brief.get("module_version"))]

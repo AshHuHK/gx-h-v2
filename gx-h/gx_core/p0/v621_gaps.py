@@ -199,6 +199,11 @@ def prepare(conn, task, decision):
     brief = json.loads(task["snapshot_json"])
     gaps = {g["gap_ref"]: g for g in brief.get("research_progress", {}).get("open_gaps", [])}
     if any(g not in gaps for g in selected):
+        from . import harness_policy
+        if harness_policy.enabled(brief):
+            raise ScopeDenied("resolved_gaps accepts only gap_ref values from research_progress.open_gaps in this "
+                              "Lead brief. Omit resolved_gaps if this decision does not resolve a registered gap.",
+                              details={"field": "resolved_gaps"})
         raise ScopeDenied("The requested gap must be open in this frozen Lead brief")
     visible = set(json.loads(task["visible_refs_json"]))
     if not set(decision["evidence_refs"]) <= visible:

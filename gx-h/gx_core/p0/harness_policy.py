@@ -13,9 +13,17 @@ def active(conn, run_id):
     return row is not None and row[0] == VERSION
 
 
-def inferable_inputs(decision_body):
+def inferable_fields(decision_body):
     """Project the caller-owned draft schema; selected inputs are checked before Job admission."""
     for variant in decision_body["properties"]["ops"]["items"]["oneOf"]:
-        if variant["properties"]["op"]["const"] == "add_node" and "inputs" in variant["required"]:
-            variant["required"].remove("inputs")
+        kind = variant["properties"]["op"]["const"]
+        field = {"add_node": "inputs", "close_run": "reason", "open_intent": "intent"}.get(kind)
+        if field in variant["required"]:
+            variant["required"].remove(field)
+        if kind == "close_run":
+            variant["properties"]["reason"] = dict(variant["properties"]["reason"],
+                                                   description="Defaults to the submitted rationale for a sole close_run.")
+        elif kind == "open_intent":
+            variant["properties"]["intent"] = dict(variant["properties"]["intent"],
+                                                   description="New local: label. Optional when this is the only operation.")
     return decision_body

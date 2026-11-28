@@ -22,3 +22,16 @@ PYTHONPATH=gx-h:. PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest -q acce
 同一探針在舊版 checkout 下執行時，使用候選中的 probe.py 路徑並省略 `--classified`。設 `GX_PI_SCOPE_STATES` 可保留每個獨立實驗的 SQLite。上述組合實測 23 項全過，含正常 Job 與中斷恢復。
 
 科學資產與舊版目錄的 21 個鄰接回歸亦已通過。受控 Lead 的中性 Goal 在既有首查明示空條款，保留原測試對翻頁、重播、輸入領域與實際 CPU 計算的斷言。
+
+## 凍結候選的官方首試
+
+`362157a` 上各開一個普通 Goal，只給表中原句。兩案沿現有 ChatGPT OAuth、Clash 及官方 App Server 執行，模型為 gpt-6.2-astra，推理強度 max。兩次首次查詢就留下結構化判讀。原始 code-mode 呼叫、對應 GX 回執與版本均在 official-first-openings.json。
+
+|Run|真實 Lead 首查|同 Run 操作員綁定 `yeast-archive-lookup@2`|
+|---|---|---|
+|gxr_01m8g0bm5ygyf84cgq|分成兩個階段，各引用相應原句|生效，Run 能力修訂從 0 變為 1|
+|gxr_01m8g0bm6e2frd6ws8|文獻為整題限制|SCOPE_DENIED，正式方法清單仍空|
+
+兩次綁定探針在 GX 保存模型原始判讀後執行。部署操作員透過 `bin/gx-p0 capabilities --enable yeast-archive-lookup@2` 測實際准入，方法名稱從未寫入題面。兩案隨後正常暫停，均未派發 Job。全程題被拒前，既有方法註冊程序在全站保存了已安裝的腳本副本與工具描述。兩者均無 Run 或 Task 歸屬，兩個引用在此 Run 的原生回覆與研究上下文中都出現 0 次。此案沒有資料庫讀數、有效決策、研究報告或產物讀取。
+
+舊版相容另有跨程序驗證。在固定部署路徑用 4b6aa93 建立顯式空 scope 的 Run，再原地升級至修補版重開同一 SQLite。方法數維持 0，`gx.harness/2` 沿舊格式完成總覽。見 cold-legacy.json。

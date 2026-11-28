@@ -349,7 +349,12 @@ def saved_result(receipt, turn, request_sha):
         raise ScopeDenied("Conflicting research callback identifier")
     result = json.loads(receipt["result_json"])
     if refusal := result.get("decision_refusal"):
-        raise BY_CODE[refusal["code"]](refusal["message"], details=refusal.get("details"))
+        error = BY_CODE[refusal["code"]](refusal["message"], details=refusal.get("details"))
+        if "retryable" in refusal:
+            error.retryable = refusal["retryable"]
+        if "suggested_recovery" in refusal:
+            error.suggested_recovery = refusal["suggested_recovery"]
+        raise error
     return result
 
 
@@ -707,6 +712,20 @@ def remember_refusal(roots, params, request_sha, error, *, publish=False, confli
         existing = roots.conn.execute("SELECT * FROM p0_root_calls WHERE thread_id=? AND call_id=?", (thread,call_id)).fetchone()
         if existing:
             return saved_result(existing, turn, request_sha) if publish or conflicted_lead is not None else None
+        if (publish and (isinstance(error, (StaleRevision, ScopeDenied, LeaseExpired))
+                         or error.details.get("reason") == "uncited_own_reviews")
+                and harness_policy.current(roots.conn, roots.run_id)):
+            # State may have changed since preparation. Advise a handoff only
+            # when GX actually retired the deciding task named by this thread.
+            handoff = roots.conn.execute("""SELECT e.event_id FROM events e JOIN p0_roots r
+                ON r.run_id=e.run_id AND r.task_id=e.subject_id WHERE e.run_id=? AND r.thread_id=?
+                AND e.kind='v6.decision.superseded' AND e.subject_kind='task'
+                ORDER BY e.event_id DESC LIMIT 1""", (roots.run_id, thread)).fetchone()
+            if handoff:
+                error.details["handoff_event"] = handoff[0]
+                error.retryable = False
+                error.suggested_recovery = ("End this turn. GX retired this task and will continue the same Run "
+                                            "through its authorized Lead with a refreshed brief.")
         record_call(roots.conn, params)
         roots.conn.execute("INSERT INTO p0_root_calls VALUES(?,?,?,?,?)",
                            (thread, call_id, turn, request_sha, ids.canonical_json({"decision_refusal": error.to_payload()})))

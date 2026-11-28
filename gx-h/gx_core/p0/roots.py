@@ -1126,6 +1126,9 @@ class Roots:
                     and v621_policy.science_execution(self.conn, self.run_id)):
                 status = exc.code
                 out.update(code=exc.code, **{key: exc.details[key] for key in ("reason","field","options") if key in exc.details})
+                if out.get("reason") == "uncited_own_reviews" or "handoff_event" in exc.details:
+                    out.update(retryable=exc.retryable, suggested_recovery=exc.suggested_recovery)
+                    out.update({key:exc.details[key] for key in ("uncited_review_refs", "handoff_event") if key in exc.details})
                 if out.get("reason") == "endpoint_use_unspecified":
                     out.update({key: exc.details[key] for key in ("missing_fields", "more_missing_fields")
                                 if key in exc.details})

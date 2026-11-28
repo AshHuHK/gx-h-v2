@@ -22,13 +22,16 @@ def digests(root, files):
     return {name: hashlib.sha256((root / name).read_bytes()).hexdigest() for name in files}
 
 
-def site(root):
+def site(root, commit):
+    commit = git(root, "rev-parse", commit or "HEAD")
     if git(root, "status", "--porcelain", "--", *PRODUCT):
         raise ValueError(f"Commit the deployed product before freezing {root.name}")
+    if git(root, "diff", "--name-only", commit, "--", *PRODUCT):
+        raise ValueError("The selected deployment has changed since its candidate commit")
     return {
         "branch": git(root, "branch", "--show-current"),
-        "commit": git(root, "rev-parse", "HEAD"),
-        "product_trees": {name: git(root, "rev-parse", "HEAD:" + name) for name in PRODUCT},
+        "commit": commit,
+        "product_trees": {name: git(root, "rev-parse", commit + ":" + name) for name in PRODUCT},
         "site_files_sha256": digests(root, SITE),
         "python": subprocess.check_output([str(root / ".venv/bin/python"), "-V"], text=True).strip(),
     }
@@ -38,9 +41,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("full", type=Path)
     parser.add_argument("slim", type=Path)
+    parser.add_argument("--full-commit")
+    parser.add_argument("--slim-commit")
     args = parser.parse_args()
     full, slim = args.full.resolve(), args.slim.resolve()
     result = {"recorded_utc": datetime.now(timezone.utc).isoformat(),
-              "full": site(full), "slim": site(slim),
+              "full": site(full, args.full_commit), "slim": site(slim, args.slim_commit),
               "protocol_files_sha256": digests(full / "acceptance/harness_final", PROTOCOLS)}
     print(json.dumps(result, indent=2))

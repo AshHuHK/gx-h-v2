@@ -198,6 +198,22 @@ class SharedJob(unittest.TestCase):
             self.assertEqual(len({(r["result_ref"], r["job_id"]) for r in rows}), 1)
             self.assertEqual(s.conn.execute("SELECT count(*) FROM jobs").fetchone()[0], 1)
 
+    def test_failed_physical_job_cannot_acquire_a_new_subscriber(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            s, _, (a,b) = self.start(tmp)
+            with patch.object(executor, "launch", side_effect=executor.RunnerLaunchFailed("known not started")), \
+                    self.assertRaisesRegex(ResourceDenied, "known not started"):
+                self.dispatch(s.conn, s.run_id, a)
+            failed = s.conn.execute("SELECT job_id,status FROM jobs").fetchone()
+            self.assertEqual(failed["status"], "FAILED")
+            self.assertEqual(self.dispatch(s.conn, s.run_id, b), "waiting")
+            self.assertIsNone(v6_jobs._node(s.conn, s.run_id, b)["job_id"])
+            self.dispatch(s.conn, s.run_id, a)
+            outcome = s.settle(b)
+            self.assertEqual(outcome["status"], "SUCCEEDED")
+            self.assertNotEqual(outcome["job_id"], failed["job_id"])
+            self.assertEqual(s.conn.execute("SELECT count(*) FROM events WHERE kind='v6.node.subscribed'").fetchone()[0], 0)
+
     def test_execution_key_distinguishes_seed_weights_private_or_independent_work(self):
         with tempfile.TemporaryDirectory() as tmp:
             s, _, (a,b) = self.start(tmp)
@@ -210,7 +226,7 @@ class SharedJob(unittest.TestCase):
                                                module_binding={"descriptor":descriptor} if local else None)
             self.assertEqual(identity(base, {}), identity(base, {}, local=True))
             method = deepcopy(base)
-            method["manifest"]["applicable_domain"] = {"schema": "gx.science-domain/1", "inputs": {},
+            method["manifest"]["applicable_domain"] = {"schema": "gx.science-domain/1", "inputs": {"structure":{"media_types":["chemical/x-mmcif"]}},
                             "randomness":{"mode":"stochastic", "seed_parameter":"seed"}}
             first = identity(method, {"seed": 7})
             second = identity(method, {"seed": 8})

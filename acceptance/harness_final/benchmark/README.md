@@ -33,3 +33,14 @@ Pass the same private path to inspect an existing attempt. The long runner's `be
 A completed physical Job qualifies for continuity only when the tool and runner were alive at the controller cut and the same PID and process start times appear in the later outcome. A reused Job ID alone cannot demonstrate continuity. Count a relaunch against the same request separately from a later request for a different instrument or an explicitly independent check. A model can legitimately decide the scientific question without spawning any external measurement. Such an arm still receives its scientific score and has no observed in-flight takeover.
 
 The assessment retains official cumulative token subtotals per thread, physical CPU time, provider startup and execution times. Model-turn intervals can include synchronous tool waits. These overlapping durations cannot be added. A controller/other gap needs complete turn boundaries. Each group contributes one independent question attempt. The resulting counts describe these cases and cannot establish a general speedup or reliability rate.
+
+## Reading and reproducing the corrective trials
+
+The [field report](RESULTS.md) links the original and follow-up receipts separately. To re-export the original physical files and timing values from a private field workspace without starting another model, run `long/archive_outputs.py` on the existing series. To inspect the published comparison without that workspace, read `output-verification.json` and hash the named JSON files under `outputs/`.
+
+The separately registered follow-up used one new workspace for the repaired commit. On the deployed series these commands reopen the saved original trial records and preserve their decisions.
+
+```sh
+"$python" -B "$bench/short/followup.py" "$followup_work/short" "$followup_checkout" "$followup_commit"
+"$python" -B "$bench/long/followup.py" "$followup_work/long" "$followup_commit"
+```

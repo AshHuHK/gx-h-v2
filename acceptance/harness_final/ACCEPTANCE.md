@@ -49,3 +49,9 @@ CPU 評分 Job `gxj_01m8g0v91xknqrv75g` 得到 **122/123 個可比 Cα 位置、
 ### 修後真模型診斷
 
 另行預註冊的候選是 `6077e26`／`ccd0513`，原三臂首試照原分數公布。長題 `gxr_01m8g13cqej2zc3fs1` 有正式 Lead 的原生送達回執，可以逐字比對兩站的面積資料。Lead 引用了新資料，決定總流量的十倍敘述可用、單位面積的十倍敘述不成立，事件 89 關題，獨立盲評 7/7。短題 `gxr_01m8g15z1x8rjmec38` 也是 7/7；253.43 秒，4 個回合、2 次結題、2 筆拒收，首次結題仍為 0/1。這次沒有自然出現原本的錯誤等待格式；拒收說明的效果只由原參數的定向重放證明。[修後長題](benchmark/long/followup/results.json) · [修後短題](benchmark/short/followup/results.json) · [原始格式拒收](watch_diagnostics/README.md)
+
+### 最終工程發行
+
+完整站產品 `e8140c6c6efe5277bfb5aed4e70ab9ec175aae6b`，精簡站產品 `569657aed3faa72c12e0a7944c7e9dcfd849c3af`。兩站各有 54 個交付檔相對原版本改變；52 個改動後的 Git blob 相同，另兩個保留精簡站的專屬插件登記與 PDF 安裝提示。原場另發現的文獻卷號與年份誤拒，已用當時有權引用的 JATS 原件重放。書目可發表，實際數值仍需引證，未替先前的兩個完整報告補簽。模型給子席零次原生調用時，原回執會說明原委派無法開工及如何另開有預算的工作。[雙站完整部署樹](release-installations.json) · [逐檔差異](deploy/receipts/bibliography-parity-including-adapters.json) · [原回呼重放](evidence/bibliography-replay.json) · [真場子席零回合](delegation/README.md)
+
+各站實際掛載的發行結果為 **歷史 121/121、前版 Harness 92/92、本輪 67/67**。乾淨無掛載環境各有 **67/67** 項本輪測試通過，前版測試各 90 通過、2 個授權快照測試跳過。四組角色與歸檔資料摘要由各站實測。原近期 /2 Goal 從原部署冷開後，模型回合與 Job 的增量皆為 0。[逐站測試分母與日誌索引](deploy/receipts/bibliography-tests.json)

@@ -27,7 +27,7 @@ from ..jobs import diagnostics
 from ..jobs.service import JobService, PURPOSE_WORKFLOW, TERMINAL
 from ..persistence import store
 from . import manifest as execution
-from . import module_methods, research_window, v6_method_context, v6_prospective, v62_evidence
+from . import harness_policy, module_methods, research_window, v6_method_context, v6_prospective, v62_evidence
 from ..plugins import goal as goal_plugins
 
 NODE_TERMINAL = {"SUCCEEDED", "FAILED", "CANCELLED", "REUSED", "BLOCKED"}
@@ -187,7 +187,10 @@ def confirmed_result_identity(conn, node_id, proof, *, verify_inputs=False):
     if (ids.sha256_of_obj(identity) != attempt["attempt_key"] or attempt["attempt_key"] != attempt["exec_key"]
             or attempt["exec_key"] != owner.get("exec_key")
             or identity["capability"] != f"{method['id']}@{method['version']}"
-            or identity.get("module_provider") != admission.get("module_capability", {}).get("plugin")
+            or (identity["version"] == 1 and identity.get("module_provider")
+                != admission.get("module_capability", {}).get("plugin"))
+            or (identity["version"] == 2 and (identity["provider"] != admission.get("execution_provider")
+                                               or identity["program_sha256"] != admission.get("program_sha256")))
             or identity["manifest_sha256"] != method["sha256"] or identity["roles"] != roles
             or identity["parameters"] != admission["parameters"]
             or _runtime_identity(identity["runtime"]) != environment):
@@ -289,11 +292,40 @@ def _small_data_pins(paths):
     return pins
 
 
+def program_pins(method, environment):
+    """Only executables used by this method participate in its scientific identity."""
+    view = manifest.EnvView(env_id=environment["env_id"], python=environment["python_executable"],
+                            binaries=environment["binary_paths"], prefix=environment["prefix"])
+    names = {name.removeprefix("env.bin.") for arg in method["entry"]["argv_template"]
+             for name in manifest.placeholders(arg) if name.startswith("env.bin.")}
+    pins = {}
+    try:
+        for name in sorted(names):
+            pins[name] = ids.sha256_of_file(view.binaries[name])
+        source = method["source"]
+        if source.get("path") and source.get("sha256"):
+            path = manifest.resolve_path(source["path"], env=view)
+            if not path.is_file():
+                return None
+            pins["source_sha256"] = ids.sha256_of_file(path)
+            if pins["source_sha256"] != source["sha256"]:
+                return None
+    except (OSError, KeyError):
+        return None
+    return pins
+
+
+def execution_provider(conn, run_id, cap, module_binding):
+    descriptor = module_binding["descriptor"] if module_binding else next(
+        (d for d in goal_plugins.catalog(conn, run_id) if d["capability_version"] == cap), {})
+    return goal_plugins.effective_provider(descriptor)
+
+
 def method_identity(conn, run_id, cap, method, entries, params, *, module_binding=None):
     runtime = environments.require_ready(conn, method["env_id"])
     resources = manifest.effective_resources(method["manifest"], {})
     env = execution._runtime(runtime, resources, {})
-    return {
+    identity = {
         "version": 1,
         "capability": cap,
         "manifest_sha256": method["manifest_sha256"],
@@ -305,6 +337,46 @@ def method_identity(conn, run_id, cap, method, entries, params, *, module_bindin
         **({"required_data_sha256": _small_data_pins(method["manifest"]["required_data"])}
            if method["manifest"].get("required_data") else {}),
     }
+    if not harness_policy.current(conn, run_id):
+        return identity
+    declared = method["manifest"]
+    domain = input_domain.declarations(declared["method_card"].get("applicable_domain"),
+                                       declared.get("applicable_domain"))
+    randomness = []
+    for rule in domain.values():
+        if random := rule.get("randomness"):
+            if random["mode"] == "deterministic":
+                randomness.append({"mode": "deterministic"})
+            else:
+                seed = random.get("fixed_seed", params.get(random.get("seed_parameter")))
+                randomness.append({"mode": "seeded" if type(seed) is int else "unknown", "seed": seed})
+    portable = shipped.portable_digest(method["bundle"])
+    if not randomness:
+        pinned = cap in shipped.MANIFESTS and portable == shipped.pin(cap)
+        randomness = [{"mode": "deterministic" if pinned else "unknown"}]
+    identity.pop("module_provider", None)
+    identity.update(version=2, provider=execution_provider(conn, run_id, cap, module_binding), executable=portable,
+                    program_sha256=program_pins(declared, runtime),
+                    weights=[{k: w[k] for k in ("sha256", "bytes", "load_mode")} for w in declared["weights"]],
+                    licence=declared.get("licence"), randomness=randomness)
+    return identity
+
+
+def _reuse_scope(conn, node, refs, identity):
+    """Public Run originals can move between seats. A derived or private input stays within its branch."""
+    spec = json.loads(node["spec_json"])
+    if (spec.get("independent_repeat") or any(rule["mode"] == "unknown" for rule in identity["randomness"])
+            or identity.get("required_data_sha256", {}) is None or identity["program_sha256"] is None):
+        return {"independent_node": node["node_id"]}
+    module = conn.execute("SELECT grant_json FROM v62_modules WHERE run_id=? AND branch_id=?",
+                          (node["run_id"], node["branch_id"])).fetchone()
+    if module and json.loads(module[0]).get("communication") == "isolated":
+        return {"private_branch": node["branch_id"]}
+    public = {r[0] for r in conn.execute("""SELECT json_extract(f.value,'$.artifact_ref') FROM runs r,
+            json_each(r.inputs_json,'$.files') f WHERE r.run_id=?""", (node["run_id"],))}
+    if set(refs) - public:
+        return {"private_branch": node["branch_id"]}
+    return {"public_inputs": list(refs)}
 
 
 def bind_inputs(conn, run_id, cap, method, refs, parameters, *, writable, module_binding=None):
@@ -335,7 +407,9 @@ def _compile(conn, node, refs):
     ).artifact_ref
     entries = artifacts.read_input_manifest(inputs_ref)["entries"]
     identity = method_identity(conn, node["run_id"], cap, method, entries, params, module_binding=local)
-    if spec.get("independent_repeat"):
+    if identity["version"] == 2:
+        identity.update(_reuse_scope(conn, node, refs, identity))
+    elif spec.get("independent_repeat"):
         identity["independent_node"] = node["node_id"]
     exec_key = ids.sha256_of_obj(identity)
     plan_key = ids.sha256_of_obj(
@@ -428,7 +502,8 @@ def _branch_room(conn, node, amounts):
             "shortfalls": shortfalls, "held_reservations": reservations})
 
 
-def fence_admission(conn, request, request_sha, key, job_id, amounts, runtime, method_dependencies, required_data):
+def fence_admission(conn, request, request_sha, key, job_id, amounts, runtime, method_dependencies, required_data,
+                    provider=None, program_sha256=None):
     """The Job writer calls this after inserting the row, inside its own admission transaction."""
     binding = request.get("binding") or {}
     node = _node(conn, request["run_id"], binding.get("v6_node_id"))
@@ -471,6 +546,8 @@ def fence_admission(conn, request, request_sha, key, job_id, amounts, runtime, m
     ):
         raise IdempotencyConflict("Job request differs from its admitted graph assignment")
     identity = json.loads(attempt["identity_json"])
+    if identity["version"] == 2 and (identity["provider"] != provider or identity["program_sha256"] != program_sha256):
+        raise SchemaInvalid("The executing provider changed after the node was prepared")
     if "required_data_sha256" in identity and identity["required_data_sha256"] != required_data:
         raise SchemaInvalid("Required method data changed after the graph node was prepared")
     if identity.get("method_dependencies", {}) != method_dependencies:
@@ -566,7 +643,9 @@ def _finish(conn, node, status, *, result=None, job_id=None, source=None, job_st
             _live(current, "PENDING")
             _module_grant(tx, current, json.loads(current["spec_json"]))
             v62_evidence.fence_negative(tx, current, condition)
-        if source:
+        if source and current["status"] == "CANCEL_REQUESTED" and not current["job_id"]:
+            return False
+        if source and current["status"] == "PENDING":
             _live(current, "PENDING")
             attempt = tx.execute("SELECT request_json FROM v6_job_attempts WHERE node_id=?", (node["node_id"],)).fetchone()
             from . import capability_views
@@ -578,13 +657,18 @@ def _finish(conn, node, status, *, result=None, job_id=None, source=None, job_st
             if spec.get("evidence_gate"):
                 v62_evidence.fence(tx, current, evidence)
             execution.require_current(tx, job_id)
+        if source and current["status"] == "RUNNING":
+            subscribed = tx.execute("SELECT reused_from FROM v6_job_attempts WHERE node_id=?",
+                                    (current["node_id"],)).fetchone()[0]
+            if subscribed != source:
+                raise SchemaInvalid("The result belongs to a different physical Job subscription")
         if current["status"] == "CANCEL_REQUESTED":
             status = "CANCELLED"  # Keep late result and actual Job status on their original identity.
         tx.execute(
             "UPDATE v6_nodes SET status=?,result_ref=?,job_id=COALESCE(job_id,?) WHERE node_id=?",
             (status, result, job_id, node["node_id"]),
         )
-        tx.execute("UPDATE v6_job_attempts SET reused_from=? WHERE node_id=?", (source, node["node_id"]))
+        tx.execute("UPDATE v6_job_attempts SET reused_from=COALESCE(reused_from,?) WHERE node_id=?", (source, node["node_id"]))
         _consume(tx, node)
         if acquisition and status in ("SUCCEEDED", "REUSED"):
             acquired_material.attach(tx, current, acquisition)
@@ -683,13 +767,51 @@ def _record_wait(conn, node, error):
             )
 
 
+def _subscribe(conn, node, source, spec, request, evidence):
+    """Adopt a launched physical Job under the receiver's still-active delegation."""
+    from . import capability_views, research_dialogue
+    with _tx(conn, node["run_id"], "subscribe_node_to_job") as tx:
+        receiver = _node(tx, node["run_id"], node["node_id"])
+        if receiver["status"] != "PENDING":
+            return "waiting"
+        _live(receiver, "PENDING")
+        sender = _node(tx, node["run_id"], source["node_id"])
+        if sender["status"] != "RUNNING" or sender["job_id"] != source["job_id"]:
+            return "waiting"
+        if research_dialogue.blocked(tx, node["run_id"], branch_id=receiver["branch_id"]):
+            return "waiting"
+        if "module_method_event" not in spec:
+            capability_views.require_for_node(tx, node["run_id"], spec["capability"])
+        _module_grant(tx, receiver, spec)
+        _prospective(tx, request)
+        if spec.get("evidence_gate"):
+            v62_evidence.fence(tx, receiver, evidence)
+        execution.require_current(tx, sender["job_id"])
+        physical_owner = source["reused_from"] or sender["node_id"]
+        tx.execute("UPDATE v6_nodes SET status='RUNNING',job_id=? WHERE node_id=?",
+                   (sender["job_id"], receiver["node_id"]))
+        tx.execute("UPDATE v6_job_attempts SET reused_from=? WHERE node_id=?",
+                   (physical_owner, receiver["node_id"]))
+        _consume(tx, receiver)
+        store.append_event(tx, kind="v6.node.subscribed", actor="gx", run_id=receiver["run_id"],
+            subject_kind="node", subject_id=receiver["node_id"], prev_state="PENDING", new_state="RUNNING",
+            payload={"job_id": sender["job_id"], "physical_owner": physical_owner,
+                     "branch_id": receiver["branch_id"], "exec_key": receiver["exec_key"],
+                     "operation_key": receiver["operation_key"]})
+    return "subscribed"
+
+
 def _active(conn, node, service):
     """Recover by accepted execution identity. OUTCOME_UNKNOWN keeps its hold and remains active."""
     view = service.status(node["job_id"])
     if node["status"] == "CANCEL_REQUESTED" and not view["terminal"]:
-        service.cancel(
-            node["job_id"], reason="GX decision withdrew this node", idempotency_key=node["operation_key"]
-        )
+        other = conn.execute("SELECT 1 FROM v6_nodes WHERE job_id=? AND node_id<>? AND status='RUNNING' LIMIT 1",
+                             (node["job_id"], node["node_id"])).fetchone()
+        if other:
+            return "settled" if _finish(conn, node, "CANCELLED", job_id=node["job_id"],
+                    job_status=view["status"], reason="Only this scientific subscription was withdrawn") else "waiting"
+        cancel_key = "cancel:" + node["job_id"] if harness_policy.current(conn, node["run_id"]) else node["operation_key"]
+        service.cancel(node["job_id"], reason="GX decision withdrew the last active node", idempotency_key=cancel_key)
         view = service.status(node["job_id"])
     if view["terminal"]:
         result = None
@@ -702,6 +824,19 @@ def _active(conn, node, service):
             if not result:
                 failure = "Job completed without a scientific output"
                 status = "FAILED"
+        accepted = conn.execute("SELECT reused_from FROM v6_job_attempts WHERE node_id=?",
+                                (node["node_id"],)).fetchone()
+        subscribed = accepted["reused_from"] if accepted else None
+        if subscribed and status == "SUCCEEDED" and node["status"] != "CANCEL_REQUESTED":
+            proof = execution.read_manifest(conn, view["job_id"])
+            output = proof["completion"]["outputs"][0]
+            verified = storage.artifact_service(conn).verify(result)
+            if (proof["admission"]["owner"].get("node_id") != subscribed
+                    or proof["admission"]["owner"].get("exec_key") != node["exec_key"]
+                    or not verified["ok"] or verified["observed_sha256"] != output["sha256"]):
+                raise SchemaInvalid("Subscribed Job result differs from its frozen execution")
+            execution.require_current(conn, view["job_id"])
+            status = "REUSED"
         finished = _finish(
             conn,
             node,
@@ -709,6 +844,7 @@ def _active(conn, node, service):
             job_id=view["job_id"],
             result=result,
             job_status=view["status"],
+            source=subscribed,
             reason=failure,
         )
         return "settled" if finished else "waiting"
@@ -758,14 +894,18 @@ def _run_node(conn, node, service, window):
     request = json.loads(attempt["request_json"])
     # A parked node should not restage a Job workspace while its Lead is still deciding.
     _prospective(conn, request)
+    identity = json.loads(attempt["identity_json"])
+    current_contract = identity["version"] == 2
     source = conn.execute(
-        "SELECT * FROM v6_nodes WHERE run_id=? AND node_id<>? AND exec_key=? AND "
-        "status='SUCCEEDED' AND result_ref IS NOT NULL ORDER BY rowid LIMIT 1",
-        (node["run_id"], node["node_id"], attempt["exec_key"]),
+        "SELECT n.*,a.reused_from FROM v6_nodes n JOIN v6_job_attempts a USING(node_id) "
+        "WHERE n.run_id=? AND n.node_id<>? AND n.exec_key=? AND n.job_id IS NOT NULL AND "
+        "(((n.status='SUCCEEDED' OR (? AND n.status='REUSED')) AND n.result_ref IS NOT NULL) OR "
+        "(? AND n.status='RUNNING' AND EXISTS (SELECT 1 FROM jobs j WHERE j.job_id=n.job_id "
+        "AND j.status <> 'CREATED'))) ORDER BY (n.result_ref IS NULL),n.rowid LIMIT 1",
+        (node["run_id"], node["node_id"], attempt["exec_key"], current_contract, current_contract),
     ).fetchone()
     # A large mutable repository or directory has no byte pin. A successful
     # earlier result cannot establish that this node would use the same data.
-    identity = json.loads(attempt["identity_json"])
     if source:
         method = registry.candidate(conn, spec["capability"])
         paths = method["manifest"].get("required_data", ())
@@ -776,15 +916,33 @@ def _run_node(conn, node, service, window):
         if paths and _small_data_pins(paths) != identity["required_data_sha256"]:
             raise SchemaInvalid("Required method data changed before the previous result could be reused")
         active = environments.require_ready(conn, method["env_id"])
+        local = module_methods.for_spec(conn, node["run_id"], spec)
+        if current_contract:
+            if (identity["provider"] != execution_provider(conn, node["run_id"], spec["capability"], local)
+                    or identity["executable"] != shipped.portable_digest(method["bundle"])
+                    or identity["program_sha256"] != program_pins(method["manifest"], active)):
+                raise SchemaInvalid("Prior execution has a different provider or executable")
+            for part in ("entry_script", "parser"):
+                if script := method["bundle"].get(part):
+                    manifest.script_path(script)
+            if method["manifest"]["weights"]:
+                env = manifest.EnvView(env_id=active["env_id"], python=active["python_executable"],
+                                       binaries=dict(active["binary_paths"]), prefix=active["prefix"])
+                for weight in method["manifest"]["weights"]:
+                    path = manifest.resolve_path(weight["path"], env=env)
+                    if not path.is_file() or ids.sha256_of_file(path) != weight["sha256"]:
+                        raise SchemaInvalid("Prior execution has different or unavailable model weights")
         current = execution._runtime(active, manifest.effective_resources(method["manifest"], {}), {})
         if (
             identity["manifest_sha256"] != method["manifest_sha256"]
             or identity["runtime"] != current
             or identity.get("method_dependencies", {})
             != v6_method_context.dependencies(conn, node["run_id"], spec["capability"], active["python_executable"],
-                                              module_binding=module_methods.for_spec(conn, node["run_id"], spec))
+                                              module_binding=local)
         ):
             raise SchemaInvalid("Compiled attempt is incompatible with the currently installed method")
+        if source["status"] == "RUNNING":
+            return _subscribe(conn, node, source, spec, request, evidence)
         # Hash the original bytes outside a write transaction; adoption retains the original Job identity.
         proof = execution.read_manifest(conn, source["job_id"])
         confirmed_result_identity(conn, source["node_id"], proof, verify_inputs=True)
@@ -808,7 +966,7 @@ def _run_node(conn, node, service, window):
                 conn,
                 node,
                 "REUSED",
-                source=source["node_id"],
+                source=source["reused_from"] or source["node_id"],
                 evidence=evidence,
                 job_id=source["job_id"],
                 job_status="SUCCEEDED",
@@ -917,7 +1075,8 @@ def advance(conn, run_id):
         if node["status"] in NODE_TERMINAL:
             continue
         try:
-            counts[_run_node(conn, node, service, window)] += 1
+            outcome = _run_node(conn, node, service, window)
+            counts[outcome] = counts.get(outcome, 0) + 1
         except (
             BudgetExceeded,
             ResourceDenied,

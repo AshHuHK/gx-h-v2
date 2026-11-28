@@ -1,0 +1,32 @@
+FF
+======================================================================
+FAIL: test_lost_ack_two_seats_cancel_producer_cold_resume (__main__.SharedJob.test_lost_ack_two_seats_cancel_producer_cold_resume)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/gxh-final-jobs/acceptance/harness_final/jobs/test_shared_jobs.py", line 83, in test_lost_ack_two_seats_cancel_producer_cold_resume
+    self.assertEqual(counts.get("subscribed"), 1)
+AssertionError: None != 1
+
+======================================================================
+FAIL: test_isolated_seat_does_its_own_work (__main__.SharedJob.test_isolated_seat_does_its_own_work)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/gxh-final-jobs/acceptance/harness_final/jobs/test_shared_jobs.py", line 214, in test_isolated_seat_does_its_own_work
+    self.assertEqual([r["status"] for r in rows], ["SUCCEEDED", "SUCCEEDED"])
+AssertionError: Lists differ: ['SUCCEEDED', 'REUSED'] != ['SUCCEEDED', 'SUCCEEDED']
+
+First differing element 1:
+'REUSED'
+'SUCCEEDED'
+
+- ['SUCCEEDED', 'REUSED']
+?                ^ ^^
+
++ ['SUCCEEDED', 'SUCCEEDED']
+?                ^^^^ ^^
+
+
+----------------------------------------------------------------------
+Ran 2 tests in 3.569s
+
+FAILED (failures=2)

@@ -695,12 +695,16 @@ class JobService:
             prepared = execution_manifest.prepare_runtime(intent, capability["bundle"], env, resources, preflight)
             v6_node = (request.get("binding") or {}).get("v6_node_id")
             if v6_node:
-                from ..p0 import module_methods, v6_jobs, v6_method_context, v62_evidence
+                from ..p0 import harness_policy, module_methods, v6_jobs, v6_method_context, v62_evidence
+                local = module_methods.for_request(conn, request)
+                if harness_policy.current(conn, run_id):
+                    prepared["execution_provider"] = v6_jobs.execution_provider(conn, run_id, request["capability_version"], local)
+                    prepared["program_sha256"] = v6_jobs.program_pins(manifest, env)
                 gate_proof = v62_evidence.prepare_dispatch(conn, request)
                 required_data = v6_jobs._small_data_pins(manifest["required_data"]) if manifest.get("required_data") else {}
                 method_dependencies = v6_method_context.dependencies(
                     conn, run_id, request["capability_version"], env["python_executable"],
-                    module_binding=module_methods.for_request(conn, request))
+                    module_binding=local)
             sample = capacity.sample_admission(conn)
             with store.transaction(conn, transaction_owner="JobService", operation="admit", run_id=run_id) as txn:
                 if reserved_job_id is not None:
@@ -747,7 +751,9 @@ class JobService:
                 if v6_node:
                     v62_evidence.fence_dispatch(txn, request, gate_proof)
                     v6_jobs.fence_admission(txn, request, request_sha, key, job_id, amounts,
-                                            prepared["runtime"], method_dependencies, required_data)
+                                            prepared["runtime"], method_dependencies, required_data,
+                                            provider=prepared.get("execution_provider"),
+                                            program_sha256=prepared.get("program_sha256"))
                 elif txn.execute("SELECT 1 FROM sqlite_master WHERE name='v6_goals'").fetchone() and txn.execute(
                         "SELECT 1 FROM v6_goals WHERE run_id=?", (run_id,)).fetchone():
                     raise ScopeDenied("Goal-only Jobs require an accepted node assignment")

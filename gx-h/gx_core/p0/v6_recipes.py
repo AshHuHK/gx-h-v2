@@ -300,6 +300,18 @@ def _calibration_match(conn, run_id, step, bindings, source):
     original = json.loads(conn.execute("SELECT identity_json FROM v6_job_attempts WHERE node_id=?",
                                        (source["node_id"],)).fetchone()[0])
     original.pop("independent_node", None)
+    if original.get("version") == 2:
+        allowed = {r[0] for r in conn.execute("""SELECT json_extract(f.value,'$.artifact_ref') FROM runs r,
+                   json_each(r.inputs_json,'$.files') f WHERE r.run_id=?""", (run_id,))}
+        if {bindings[port["input"]] for port in step["inputs"]} - allowed:
+            return False
+        if ("private_branch" in original or original["program_sha256"] is None
+                or any(rule["mode"] == "unknown" for rule in original["randomness"])):
+            return False
+        # Public inter-Run calibration explicitly rebinds target ports and verifies the original bytes below.
+        if "public_inputs" not in original:
+            return False
+        original.pop("public_inputs")
     if shipped.portable_digest(method["bundle"]) != step["method_digest"]:
         return False
     for part in ("entry_script", "parser"):

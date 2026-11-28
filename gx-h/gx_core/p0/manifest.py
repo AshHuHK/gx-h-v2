@@ -209,6 +209,9 @@ def admit(conn, job_id, *, launch, bundle, inputs, resources, prepared):
         else:
             from ..plugins import goal
             entry = next((item for item in goal.catalog(conn, run_id) if item["capability_version"] == cap), {})
+        if "execution_provider" in prepared:
+            doc["execution_provider"] = prepared["execution_provider"]
+            doc["program_sha256"] = prepared["program_sha256"]
         if context := prepared.get("deployment_environment"):
             doc["execution_observation"] = {"deployment_environment": context,
                                             "provider_sha256": (entry.get("plugin") or {}).get("sha256")}

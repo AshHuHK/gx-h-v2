@@ -1,0 +1,105 @@
+test_already_visible_uncited_record_reopens_only_its_route_as_reinterpretation (__main__.Reinterpretation.test_already_visible_uncited_record_reopens_only_its_route_as_reinterpretation) ... ERROR
+test_cross_topic_forward_carries_one_root_to_new_topic (__main__.ScopedLineage.test_cross_topic_forward_carries_one_root_to_new_topic) ... ERROR
+test_cross_topic_synthesis_replay_disclosure_and_source_correction (__main__.ScopedLineage.test_cross_topic_synthesis_replay_disclosure_and_source_correction) ... ERROR
+
+======================================================================
+ERROR: test_already_visible_uncited_record_reopens_only_its_route_as_reinterpretation (__main__.Reinterpretation.test_already_visible_uncited_record_reopens_only_its_route_as_reinterpretation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/topics/test_scoped_lineage.py", line 140, in test_already_visible_uncited_record_reopens_only_its_route_as_reinterpretation
+    amendment = decide(actor,"review-window",[{"op":"reopen_intent","intent":rid,"revision":2,"evidence_refs":[b]}],reason,[b])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "acceptance/harness_final/topics/test_scoped_lineage.py", line 119, in decide
+    return s.call(actor,"gx_decide_revision",{"decision":{"ops":ops,"rationale":reason,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "acceptance/v62a/interleavings_fixture.py", line 198, in call
+    reply = self.roots._call(payload)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/roots.py", line 1143, in _call
+    return callback(self, p)
+           ^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/v6_native.py", line 341, in call
+    return _call(roots, p)
+           ^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/v6_native.py", line 441, in _call
+    prepared = v6_decisions.prepare(roots.conn, **identity, decision=args["decision"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/v6_decisions.py", line 327, in prepare
+    graph, ops, aliases, watches = v6_graph.compile_graph(conn, request, previous, refs,
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/v6_graph.py", line 217, in compile_graph
+    v6_routes.compile_intents(conn, request, graph, resolved_ops, aliases)
+  File "gx-h/gx_core/p0/v6_routes.py", line 175, in compile_intents
+    _new_basis(conn, request, route, spec)
+  File "gx-h/gx_core/p0/v6_routes.py", line 104, in _new_basis
+    raise SchemaInvalid("Cite new evidence or identify new PI feedback for this route")
+gx_core.errors.SchemaInvalid: SCHEMA_INVALID: Cite new evidence or identify new PI feedback for this route
+
+======================================================================
+ERROR: test_cross_topic_forward_carries_one_root_to_new_topic (__main__.ScopedLineage.test_cross_topic_forward_carries_one_root_to_new_topic)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/topics/test_scoped_lineage.py", line 96, in test_cross_topic_forward_carries_one_root_to_new_topic
+    fwd = self.hint(c,"clock-notes","forward",parent_hint_ids=[msg["hint_id"]])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "acceptance/harness_final/topics/test_scoped_lineage.py", line 37, in hint
+    return self.study.call(actor, "gx_send_research_hint", dict(operation_key=key, topic=topic, action=action, **kwargs), key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "acceptance/v62a/interleavings_fixture.py", line 198, in call
+    reply = self.roots._call(payload)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/roots.py", line 1230, in _call
+    answer = v62_native.perform_read(self, row, p, packet, read)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/v62_native.py", line 376, in perform_read
+    answer = (research_handoff.send(roots.conn, instance, args, params) if tool == research_handoff.HINT else execute(args))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/research_handoff.py", line 147, in send
+    return research_topics.send(conn,actor,args,native)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/research_topics.py", line 349, in send
+    parent_messages = [_permitted_parent(messages,i,visible) for i in parents]
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/research_topics.py", line 349, in <listcomp>
+    parent_messages = [_permitted_parent(messages,i,visible) for i in parents]
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/research_topics.py", line 117, in _permitted_parent
+    raise ScopeDenied("The parent hint is outside this topic or the researcher's visible materials")
+gx_core.errors.ScopeDenied: SCOPE_DENIED: The parent hint is outside this topic or the researcher's visible materials
+
+======================================================================
+ERROR: test_cross_topic_synthesis_replay_disclosure_and_source_correction (__main__.ScopedLineage.test_cross_topic_synthesis_replay_disclosure_and_source_correction)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "acceptance/harness_final/topics/test_scoped_lineage.py", line 60, in test_cross_topic_synthesis_replay_disclosure_and_source_correction
+    joined = self.hint(editor,"joint","publish",interpretation="The noon observation covers only the east.",
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "acceptance/harness_final/topics/test_scoped_lineage.py", line 37, in hint
+    return self.study.call(actor, "gx_send_research_hint", dict(operation_key=key, topic=topic, action=action, **kwargs), key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "acceptance/v62a/interleavings_fixture.py", line 198, in call
+    reply = self.roots._call(payload)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/roots.py", line 1230, in _call
+    answer = v62_native.perform_read(self, row, p, packet, read)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/v62_native.py", line 376, in perform_read
+    answer = (research_handoff.send(roots.conn, instance, args, params) if tool == research_handoff.HINT else execute(args))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/research_handoff.py", line 147, in send
+    return research_topics.send(conn,actor,args,native)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/research_topics.py", line 349, in send
+    parent_messages = [_permitted_parent(messages,i,visible) for i in parents]
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/research_topics.py", line 349, in <listcomp>
+    parent_messages = [_permitted_parent(messages,i,visible) for i in parents]
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "gx-h/gx_core/p0/research_topics.py", line 117, in _permitted_parent
+    raise ScopeDenied("The parent hint is outside this topic or the researcher's visible materials")
+gx_core.errors.ScopeDenied: SCOPE_DENIED: The parent hint is outside this topic or the researcher's visible materials
+
+----------------------------------------------------------------------
+Ran 3 tests in 4.579s
+
+FAILED (errors=3)

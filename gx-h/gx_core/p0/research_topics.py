@@ -74,7 +74,7 @@ def _retired(messages):
     return retired
 
 
-def _project(messages, visible, cursor, reader=None, replay=False):
+def _project(messages, visible, cursor, reader=None, replay=False, *, fold_cross_topic=False):
     """Present effective interpretations and distinguish repeated forwards from new work."""
     retired = _retired(messages)
     by_id = {m["hint_id"]:m for m in messages}
@@ -82,7 +82,13 @@ def _project(messages, visible, cursor, reader=None, replay=False):
     forwarded_origin = {}
     result = []
     for message in messages:
-        if message["action"] == "forward":
+        if message["action"] == "withdrawn":
+            prior = by_id[message["replaces"]]
+            if (not replay and prior["event_id"] <= cursor < message["event_id"]
+                    and set(prior["visibility_refs"]) <= visible):
+                result.append({k:message[k] for k in ("event_id", "topic", "action", "replaces")})
+            continue
+        if message["action"] == "forward" and (not message.get("forwarded_from_topic") or fold_cross_topic):
             if message["hint_id"] not in retired and set(message["visibility_refs"]) <= visible:
                 parent = message["parent_hint_ids"][0]
                 original = forwarded_origin.get(parent,parent)
@@ -114,7 +120,7 @@ def _project(messages, visible, cursor, reader=None, replay=False):
 def _permitted_parent(messages, hint_id, visible):
     found = next((m for m in messages if m["hint_id"] == hint_id), None)
     if found is None or not set(found["visibility_refs"]) <= visible:
-        raise ScopeDenied("The parent hint is outside this topic or the researcher's visible materials")
+        raise ScopeDenied("The parent hint is unavailable in this researcher's Goal and material scope")
     return found
 
 
@@ -154,7 +160,7 @@ def lead_preview(conn, run_id, goal_version, visible_refs, *, before_event=None,
     if not active:
         return []
     messages = _messages(conn,run_id,goal_version,topic)
-    findings = _project(messages,set(visible_refs),0,replay=True)
+    findings = _project(messages,set(visible_refs),0,replay=True,fold_cross_topic=topic is None)
     if before_event is not None:
         findings = [m for m in findings if m["event_id"] < before_event]
     return findings[-PAGE_SIZE:]
@@ -190,7 +196,14 @@ def context(conn, member):
 
 def check_receipt(conn, member, tool, answer):
     """Replayed native callbacks still obey the live material and blind-review scope."""
-    from . import research_handoff
+    from . import harness_policy, research_handoff
+    if (tool == research_handoff.HINT and "topic" in answer and "hint_id" in answer
+            and harness_policy.current(conn,member["run_id"])):
+        if isolated(member):
+            raise ScopeDenied("Peer communication is outside the current independent assignment")
+        sent = _messages(conn,member["run_id"],member["goal_version"],answer["topic"])
+        _permitted_parent(sent,answer["hint_id"],visible_refs(conn,member))
+        return answer
     topic_receipt = "entries" in answer and "topic" in answer
     if not topic_receipt and "research_topics" not in answer:
         return answer
@@ -242,7 +255,7 @@ def pending(conn, member, *, after=0):
 def _wake(conn, sender, message):
     from . import v62_modules, v6_goal
     peers = conn.execute("""SELECT * FROM v62_modules WHERE run_id=? AND goal_version=?
-        AND status='OPEN' AND scope!=?""",(sender["run_id"],sender["goal_version"],sender["scope"])).fetchall()
+        AND status='OPEN' AND scope!=?""",(sender["run_id"],sender["goal_version"],message["sender_scope"])).fetchall()
     messages = _messages(conn,sender["run_id"],sender["goal_version"],message["topic"])
     for peer in peers:
         sub = _subscriptions(conn,peer).get(message["topic"])
@@ -284,7 +297,7 @@ def notice_due(conn, payload):
 
 
 def send(conn, member, args, native):
-    from . import pi_materials
+    from . import harness_policy, pi_materials
     if isolated(member):
         raise ScopeDenied("An isolated research assignment cannot exchange topic messages")
     topic, action = args.get("topic"), args.get("action")
@@ -313,7 +326,7 @@ def send(conn, member, args, native):
                 chain.add(message["hint_id"])
         retired = _retired(messages)
         return {"topic":topic,"entries":[{**_view(m),"current":m["hint_id"] not in retired
-                and m["action"] != "retract"} for m in messages if m["hint_id"] in chain
+                and m["action"] not in ("retract","withdrawn")} for m in messages if m["hint_id"] in chain
                 and set(m["visibility_refs"]) <= visible]}
     if action == "subscribe":
         if set(args) != {"action","topic"}:
@@ -346,13 +359,19 @@ def send(conn, member, args, native):
         raise SchemaInvalid("Provide an open question, an interpretation or an original evidence reference")
     if not set(refs) <= visible:
         raise ScopeDenied("Cited original is outside this researcher's materials")
+    # Topics organize research subjects. Origin and disclosure follow the Goal and its material grants.
+    combined = bool(parents) and harness_policy.current(conn,member["run_id"])
+    if combined:
+        messages = _messages(conn,member["run_id"],member["goal_version"])
     parent_messages = [_permitted_parent(messages,i,visible) for i in parents]
     retired = _retired(messages)
-    if any(m["hint_id"] in retired or m["action"]=="retract" for m in parent_messages):
+    if any(m["hint_id"] in retired or m["action"] in ("retract","withdrawn") for m in parent_messages):
         raise ScopeDenied("This parent has been withdrawn or replaced; inspect the current topic")
     replace = action in ("correct","retract")
-    if replace and parent_messages[0]["sender_scope"]!=member["scope"]:
+    if replace and parent_messages[0]["sender_scope"] != member["scope"]:
         raise ScopeDenied("Only the author can correct or withdraw this hint")
+    if replace and parent_messages[0]["topic"] != topic:
+        raise ScopeDenied("Correct or retract this hint in its original topic")
     dependencies = set(refs) | (visible & pi_materials.private_originals(conn,member["run_id"]))
     for m in parent_messages:
         dependencies.update(m["visibility_refs"])
@@ -365,9 +384,37 @@ def send(conn, member, args, native):
                "originals":_originals(conn,member["run_id"],original_refs),"question":args.get("question"),
                "interpretation":args.get("interpretation"),"visibility_refs":sorted(dependencies),
                "author":{k:native[k] for k in ("threadId","turnId","callId")}}
+    cross_forward = action == "forward" and parent_messages[0]["topic"] != topic
+    if cross_forward:
+        parent = parent_messages[0]
+        while parent["action"] == "forward" and not parent.get("forwarded_from_topic"):
+            parent = _permitted_parent(messages,parent["parent_hint_ids"][0],visible)
+        message.update(forwarded_from_topic=parent_messages[0]["topic"],
+                       question=parent["question"],interpretation=parent["interpretation"])
     if replace:
         message["replaces"]=parents[0]
     eid = _append(conn,native["threadId"],member,MESSAGE,topic,message)
-    if action!="forward":
+    if action != "forward" or cross_forward:
         _wake(conn,member,{**message,"topic":topic,"event_id":eid})
+    if replace and combined:
+        _withdraw_dependents(conn, member, messages, message, retired)
     return {"topic":topic,"hint_id":hint,"event_id":eid,"origin_hint_ids":roots,"parent_hint_ids":parents}
+
+
+def _withdraw_dependents(conn, member, messages, revision, previously_retired):
+    """Record an addressable cursor update in each affected reader's original topic."""
+    affected = _retired([*messages, revision]) - previously_retired - {revision["replaces"]}
+    for prior in messages:
+        if prior["hint_id"] not in affected or prior["action"] in ("retract", "withdrawn"):
+            continue
+        if prior["action"] == "forward" and not prior.get("forwarded_from_topic"):
+            continue  # Already folded into the original entry.
+        # Do not identify the upstream correction; it can have a narrower audience.
+        cancellation = {"hint_id":ids.new_id("team_message"), "action":"withdrawn", "sender_scope":"GX",
+                        "parent_hint_ids":[prior["hint_id"]], "replaces":prior["hint_id"],
+                        "origin_hint_id":prior["origin_hint_id"], "origin_hint_ids":prior["origin_hint_ids"],
+                        "visibility_refs":prior["visibility_refs"], "source_refs":[], "original_source_refs":[],
+                        "question":None, "interpretation":None, "author":{"kind":"GX"}}
+        topic = prior["topic"]
+        eid = _append(conn,"GX",member,MESSAGE,topic,cancellation)
+        _wake(conn,member,{**cancellation, "topic":topic, "event_id":eid})

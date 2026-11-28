@@ -139,7 +139,7 @@ def _research_decision_tool(spec, brief):
     body = fields["decision"]
     if brief.get("scope") == "run":
         from . import v6_routes
-        body = v6_routes.with_operations(body)
+        body = v6_routes.with_operations(body, reinterpretation=brief.get("harness_policy") == harness_policy.VERSION)
     fields["decision"] = harness_policy.inferable_fields(body)
     return projected
 

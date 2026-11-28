@@ -1,10 +1,13 @@
 """Ordinary native callback controls with actual local CPU Job dispatch."""
+from contextlib import closing
 from pathlib import Path
 import json
 import os
+import sqlite3
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 
 from acceptance.harness_refactor.modules.research_study import ResearchStudy
@@ -68,11 +71,22 @@ class LocalSelections(unittest.TestCase):
                 study.call(right, "gx_select_capability", chosen, "now-withdrawn")
             run = study.run_id
         # A fresh Driver process settles the already-admitted Job from its frozen local method event.
-        restarted = subprocess.run([sys.executable, "-B", str(ROOT / "bin/gx-p0"), "resume", "--state",
-                                    str(tmp / "state"), "--run-id", run, "--timeout", "2"],
-                                   env={**os.environ, "GX_CODEX_OFFLINE":"1"},
-                                   text=True, capture_output=True, timeout=20)
-        self.assertIn(restarted.returncode, (0,75), restarted.stderr)
+        state = tmp / "state"
+        command = [sys.executable, "-B", str(ROOT / "bin/gx-p0"), "resume", "--state",
+                   str(state), "--run-id", run, "--timeout", "1"]
+        deadline = time.monotonic() + 20
+        with closing(sqlite3.connect((state / "gx.db").as_uri() + "?mode=ro", uri=True)) as db:
+            while True:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    self.fail(f"Node {node['node_id']} for Job {admitted} did not settle after resume")
+                restarted = subprocess.run(command, env={**os.environ, "GX_CODEX_OFFLINE": "1"},
+                                           text=True, capture_output=True, timeout=remaining)
+                self.assertIn(restarted.returncode, (0, 75), restarted.stderr)
+                status, = db.execute("SELECT status FROM v6_nodes WHERE node_id=?",
+                                     (node["node_id"],)).fetchone()
+                if status in v6_jobs.NODE_TERMINAL:
+                    break
         with ResearchStudy(tmp, reopen=True) as study:
             result, = study.rows("SELECT * FROM v6_nodes WHERE node_id=?", node["node_id"])
             self.assertEqual(result["status"], "SUCCEEDED")

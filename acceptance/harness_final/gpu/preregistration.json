@@ -1,0 +1,48 @@
+{
+  "schema": "gx.science.food_structure_field/1",
+  "utc": "2026-11-28T02:23:30.557334+00:00",
+  "candidate": "to be pinned separately before first official research turn",
+  "visible": {
+    "question.md": "7c012e6e5b7d00857b81fadb75da27468cc86e8826f98a4e968bc7c8fd182e64",
+    "goal.json": "2b16f7f346e64065aa6b6a0412118b93f0e78bc0b4c6c590a15c3bda5144e9cd",
+    "materials/P00711.json": "7aea1e754550d3ce9ae1ff1224d5d6bb97b44e90c775bc5ae45242ea4e6bae0c"
+  },
+  "uniprot": {
+    "entry": "P00711",
+    "record_sha256": "581226fe039bd716655e2e398c99f71bc8bf19752feae8b7f5f013f18875d07e",
+    "url": "https://rest.uniprot.org/uniprotkb/P00711.json",
+    "mature_chain": [
+      20,
+      142
+    ],
+    "sequence_version": 2
+  },
+  "custody": {
+    "release_after": "First published new model coordinate artifact from a succeeded provider Job in this Run. No coordinate, mapping, PDB accession, answer or reading is supplied to the research role before that condition.",
+    "reference_url": "https://files.rcsb.org/download/1F6S.cif",
+    "independent_format_url": "https://files.rcsb.org/download/1F6S.pdb",
+    "revision": "1.4",
+    "vault_digests": {
+      "1F6S.cif": "b2589808645412b9e6aafdb4f339365bf3504a624a17d4b6c1cd049b1faa1a9b",
+      "1F6S.pdb": "6d72773a12b5762b901b48de3199084919bf0437be4b249b329d904a4383315b",
+      "mapping.json": "12bb45626d54eec84706b34d0e4b5061bf66a838f9f9f7311eb242b175215667",
+      "acquisition.json": "07dd014b3c4326bb360629a9c30bbe70152948be5db6babb6c9c421278554661",
+      "map-origin.json": "e4a531eeadd7e569ddf774dc8065fe2dc6b2daba043ba6f1b572953e4b30e76c"
+    }
+  },
+  "quality": {
+    "reference": "experimentally observed model 1, chain A, 1F6S; UniProt mature chain verified identical upstream",
+    "measures": "C-alpha coverage out of all 123 pre-mapped positions; proper-rotation RMSD in angstroms. Alternate/nonunique coordinates invalidate their comparison. Predicted confidence reported separately.",
+    "decision": "At least 90% coverage and RMSD <=2.0 Å supports agreement of the mature-chain backbone in this deposit. >2.0 Å with coverage >=90% indicates lower agreement at this declared tolerance. <90% cannot classify whole-chain agreement. No activity, solution or binding claims.",
+    "independent": "Recompute from independent legacy PDB text and QCP fit; absolute agreement with plugin RMSD <=1e-5 Å. Exclude other chains, calcium/ligands and waters.",
+    "confounding": "No explicit input templates or MSA. Older public crystal may occur in training. Per-structure inclusion and this mounted parameter set exact cutoff unknown."
+  },
+  "engineering": {
+    "physical_identity": "Record runner job ID/pid/start ticks, physical GPU UUID and provider child pid/start ticks. Kill GX controller only after accepted child still in flight. Reopen same Run; one accepted provider start across all physical job directories, same PID identity, original output and no inference retry.",
+    "counters": "Separate actual inference, receipt of named model, independent scorer Job reading both products, Lead verdict and field control. No denominator for generalized accuracy, design or function.",
+    "deadline_s": 1200,
+    "model": "official Codex gpt-6.2-astra/max existing OAuth through Clash",
+    "paid_api": 0,
+    "scientific_precondition": "The control plane has a single GPU-Job grant. No prompt supplies engine names, thresholds, target answer or recipe."
+  }
+}

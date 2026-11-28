@@ -310,7 +310,7 @@ def program_pins(method, environment):
             pins["source_sha256"] = ids.sha256_of_file(path)
             if pins["source_sha256"] != source["sha256"]:
                 return None
-    except (OSError, KeyError):
+    except (GxError, OSError, KeyError):
         return None
     return pins
 
@@ -777,6 +777,9 @@ def _subscribe(conn, node, source, spec, request, evidence):
         _live(receiver, "PENDING")
         sender = _node(tx, node["run_id"], source["node_id"])
         if sender["status"] != "RUNNING" or sender["job_id"] != source["job_id"]:
+            return "waiting"
+        physical = tx.execute("SELECT status FROM jobs WHERE job_id=?", (sender["job_id"],)).fetchone()
+        if physical["status"] not in {"SUBMITTING", "SUBMITTED", "QUEUED", "RUNNING", "OUTCOME_UNKNOWN", "SUCCEEDED"}:
             return "waiting"
         if research_dialogue.blocked(tx, node["run_id"], branch_id=receiver["branch_id"]):
             return "waiting"

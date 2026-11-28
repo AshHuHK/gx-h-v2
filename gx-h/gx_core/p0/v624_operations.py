@@ -50,6 +50,31 @@ def canonical_labels(body):
     return edited if edited is not None else body
 
 
+def draft_fields(body):
+    """Reuse only values fixed by one explicit operation. Keep the original callback for replay."""
+    body = canonical_labels(body)
+    if not isinstance(body, dict) or not isinstance(body.get("ops"), list) or len(body["ops"]) != 1:
+        return body
+    op = body["ops"][0]
+    if not isinstance(op, dict):
+        return body
+    if op.get("op") == "open_intent":
+        if "intent" not in op:
+            return dict(body, ops=[dict(op, intent="local:intent")])
+        if isinstance(op["intent"], str) and not op["intent"].startswith("local:"):
+            raise SchemaInvalid("ops[0].intent must be a new local: label, or omit it for a single open_intent.",
+                                details={"field":"ops[0].intent"})
+    if op.get("op") == "close_run":
+        body = dict(body)
+        if "reason" not in op and isinstance(body.get("rationale"), str) and body["rationale"].strip():
+            body["ops"] = [dict(op, reason=body["rationale"])]
+        # A sole, explicit close is already a graph amendment. The canonical validator
+        # still checks all scientific fields and rejects unknown mode values.
+        if body.get("mode") == "resolve":
+            body["mode"] = "amend"
+    return body
+
+
 def _choice(field, message, options=()):
     return SchemaInvalid(message, details={"reason": "branch_selection_required",
                                           "field": field, "options": sorted(options)})

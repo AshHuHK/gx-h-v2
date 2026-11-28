@@ -348,7 +348,8 @@ def exhausted_report_repairs(conn, task):
 
 def _partial_reason(conn, module):
     from . import v62_budget, v62_modules
-    if reason := v62_budget.exhausted(conn, module) or exhausted_report_repairs(conn, v62_modules._task(conn, module)):
+    task = v62_modules._task(conn, module)
+    if reason := v62_budget.exhausted(conn, module) or exhausted_report_repairs(conn, task):
         return reason
     if conn.execute("SELECT 1 FROM budget_reservations WHERE budget_ref=? AND status='HELD' LIMIT 1",
                     (module["budget_ref"],)).fetchone():
@@ -360,7 +361,7 @@ def _partial_reason(conn, module):
     pending = conn.execute("SELECT status FROM v6_nodes WHERE run_id=? AND branch_id=?",
                            (module["run_id"], module["branch_id"]))
     if (not active and all(row[0] in v6_jobs.NODE_TERMINAL for row in pending)
-            and v62_budget.remaining(conn, module["budget_ref"]).get("worker_tasks", 0) < 1):
+            and v62_modules.worker_slot_exhausted(conn, module, task)):
         return "module worker task allowance exhausted"
     return None
 

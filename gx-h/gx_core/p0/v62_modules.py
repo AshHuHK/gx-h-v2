@@ -313,9 +313,38 @@ def _pending_input(conn, row, task):
         return False
     if research_topics.pending(conn, row, after=cursor[0]):
         return True
+    from . import v621_assignment
+    if conn.execute("""SELECT 1 FROM events WHERE subject_kind='module' AND subject_id=?
+            AND run_id=? AND kind=? AND event_id>? AND json_extract(payload_json,'$.previous_task_id')=? LIMIT 1""",
+            (row["module_instance_id"], row["run_id"], v621_assignment.GRANTED, cursor[0], task["task_id"])).fetchone():
+        return True
     return conn.execute("SELECT 1 FROM events WHERE run_id=? AND event_id>? AND kind='v6.node.waiting' "
                         "AND json_extract(payload_json,'$.funding_scope')=? LIMIT 1",
                         (row["run_id"], cursor[0], row["scope"])).fetchone() is not None
+
+
+def _material_handoff(conn, module, task):
+    """Find the PI grant that interrupted this unfinished assignment under the same Goal."""
+    if not task or task["status"] != "CANCELLED":
+        return None
+    from . import pi_materials, v621_assignment
+    return conn.execute(
+        """SELECT g.event_id FROM events stop JOIN events g ON g.run_id=stop.run_id
+           WHERE stop.subject_kind='task' AND stop.subject_id=? AND stop.run_id=?
+             AND stop.kind='task.transition' AND stop.new_state='CANCELLED' AND stop.reason=? AND stop.actor=?
+             AND g.subject_kind='module' AND g.subject_id=? AND g.kind=? AND g.actor='PI'
+             AND json_extract(g.payload_json,'$.goal_version')=?
+             AND json_extract(g.payload_json,'$.previous_task_id')=stop.subject_id AND g.event_id<stop.event_id
+           ORDER BY g.event_id DESC LIMIT 1""",
+        (task["task_id"], module["run_id"], pi_materials.ASSIGNMENT_REFRESH, v6_goal.ACTOR,
+         module["module_instance_id"], v621_assignment.GRANTED, module["goal_version"]),
+    ).fetchone()
+
+
+def worker_slot_exhausted(conn, module, task):
+    from . import v62_budget
+    return (v62_budget.remaining(conn, module["budget_ref"]).get("worker_tasks", 0) < 1
+            and not _material_handoff(conn, module, task))
 
 
 def _new_task(tx, row, *, previous=None, verified_nodes=None, proofs=()):
@@ -344,7 +373,13 @@ def _new_task(tx, row, *, previous=None, verified_nodes=None, proofs=()):
     tid = v6_goal.persist_brief(
         tx, rid, scope, brief, brief["head"], row["goal_version"], key, cursor, row["budget_ref"]
     )
-    seams.charge_worker_task(tx, budget_ref=row["budget_ref"], task_id=tid, actor=OWNER)
+    handoff = _material_handoff(tx, row, current)
+    if handoff:
+        store.append_event(tx, run_id=rid, kind="v62.module.worker_task_continued", actor=OWNER,
+                           subject_kind="task", subject_id=tid, payload={"previous_task_id": previous,
+                           "module_instance_id": row["module_instance_id"], "grant_event_id": handoff[0]})
+    else:
+        seams.charge_worker_task(tx, budget_ref=row["budget_ref"], task_id=tid, actor=OWNER)
     return _task(tx, row)
 
 
@@ -754,7 +789,7 @@ def _progress(conn, row):
     if (not reason and any(n["status"] not in v6_jobs.NODE_TERMINAL for n in _nodes(conn, row))
             and not _pending_input(conn, row, task)):
         return False
-    if not reason and v62_budget.remaining(conn, row["budget_ref"]).get("worker_tasks", 0) < 1:
+    if not reason and worker_slot_exhausted(conn, row, task):
         reason = "module worker task allowance exhausted"
     nodes = _nodes(conn, row)
     try:

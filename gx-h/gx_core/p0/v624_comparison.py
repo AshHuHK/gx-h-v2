@@ -121,7 +121,7 @@ def independent_choice(conn, task, body, packet):
     return None
 
 
-def normalize(conn, task, body, inventory, received, *, packet):
+def normalize(conn, task, body, inventory, received, *, packet, precise=False):
     """Return an explicit action only when grounded by this actor's operation and received evidence."""
     chosen = body.get("comparison_id")
     stated = body.get("disposition")
@@ -160,6 +160,18 @@ def normalize(conn, task, body, inventory, received, *, packet):
             candidates[cid] = effects
     if not candidates:
         if chosen or stated:
+            if precise:
+                fields = [key for key in ("comparison_id", "disposition", "affected_scope") if key in body]
+                action = "ordinary Run closure with close_run" if closing else "a decision about the Run"
+                message = f"For {action}, remove these top-level comparison fields: {', '.join(fields)}."
+                if not ops:
+                    message += " An empty ops list waits (mode=resolve or omitted)."
+                if choices:
+                    message += " To act on a registered comparison, submit the action on its branch."
+                else:
+                    message += " This brief has no active registered comparison."
+                raise SchemaInvalid(message, details={"reason":"comparison_action_ambiguous", "field":"ops",
+                                                    "options":sorted(choices), "ordinary_run_omit":fields})
             problem("comparison_action_ambiguous", "ops", "Choose an operation on the comparison, or omit its action fields.")
         return body
     used = set(body.get("metric_refs", ()))

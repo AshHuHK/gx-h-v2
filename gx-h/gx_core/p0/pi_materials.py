@@ -6,9 +6,10 @@ from ..domain import ids
 from ..errors import IdempotencyConflict, SchemaInvalid, ScopeDenied, StaleRevision
 from ..orchestration import service
 from ..persistence import store
-from . import v621_assignment
+from . import harness_policy, v621_assignment
 
 
+ASSIGNMENT_REFRESH = "The PI assigned a new scoped material"
 REGISTERED = "pi.attachment.registered"
 BRANCH_GRANTED = "pi.branch.material_granted"
 
@@ -127,6 +128,14 @@ def grant(conn, run_id, message_id, *, clause_id, branch_id, artifact_refs):
             roles = {selected[ref]["role"] for ref in artifact_refs}
             if decl.get("published_inputs_only") or ("*" not in decl["input_roles"] and not roles <= set(decl["input_roles"])):
                 raise ScopeDenied("This module's input roles exclude the supplied original")
+    prior = None
+    missing = set()
+    if module and harness_policy.active(conn, run_id):
+        prior = v62_modules._task(conn, module)
+        if prior:
+            frozen = conn.execute("SELECT visible_refs_json FROM v6_decision_tasks WHERE task_id=?",
+                                  (prior["task_id"],)).fetchone()
+            missing = set(request["artifact_refs"]) - set(store.loads(frozen, "visible_refs_json"))
     events = []
     for ref in request["artifact_refs"]:
         detail = dict(**selected[ref], clause_id=clause_id, message_id=message_id)
@@ -135,6 +144,8 @@ def grant(conn, run_id, message_id, *, clause_id, branch_id, artifact_refs):
                 AND json_extract(payload_json,'$.artifact_ref')=?""", (run_id, REGISTERED, message_id, ref)).fetchone()
             detail.update(scope=module["scope"], module_instance_id=module["module_instance_id"],
                           assignment_event_id=registration[0])
+            if ref in missing:
+                detail["previous_task_id"] = prior["task_id"]
             kind, subject, target = v621_assignment.GRANTED, "module", module["module_instance_id"]
         elif branch_id:
             kind, subject, target = BRANCH_GRANTED, "branch", branch_id
@@ -142,6 +153,10 @@ def grant(conn, run_id, message_id, *, clause_id, branch_id, artifact_refs):
             kind, subject, target = v621_assignment.ASSIGNED, "artifact", ref
         events.append(store.append_event(conn, run_id=run_id, kind=kind, actor="PI", subject_kind=subject,
                                          subject_id=target, payload=detail))
+    if missing:
+        from . import v6_goal
+        if prior["status"] in v6_goal.ACTIVE_TASKS:
+            v6_goal.cancel_decision(conn, run_id, prior["task_id"], reason=ASSIGNMENT_REFRESH)
     receipt = {**request, "grant_event_ids": events}
     store.complete_idempotent(conn, key, receipt)
     return receipt

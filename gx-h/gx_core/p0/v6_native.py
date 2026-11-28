@@ -136,11 +136,11 @@ def _research_decision_tool(spec, brief):
         return spec
     projected = deepcopy(spec)
     fields = projected["inputSchema"]["properties"]
-    body = harness_policy.inferable_inputs(fields["decision"])
+    body = fields["decision"]
     if brief.get("scope") == "run":
         from . import v6_routes
         body = v6_routes.with_operations(body)
-    fields["decision"] = body
+    fields["decision"] = harness_policy.inferable_fields(body)
     return projected
 
 

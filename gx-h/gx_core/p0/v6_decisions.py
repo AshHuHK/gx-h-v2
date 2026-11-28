@@ -217,12 +217,23 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
         wire_body = wire["inputSchema"]["properties"]["decision"]
         updated = harness_policy.active(conn, run_id)
         if updated:
-            decision = v624_operations.canonical_labels(decision)
+            decision = v624_operations.draft_fields(decision)
             from copy import deepcopy
             wire_body = v6_routes.with_operations(wire_body) if task["scope"] == "run" else deepcopy(wire_body)
-            harness_policy.inferable_inputs(wire_body)
+            harness_policy.inferable_fields(wire_body)
         issues = [] if updated else None
-        v6_graph._shape(decision, wire_body, budget_issues=issues)
+        try:
+            v6_graph._shape(decision, wire_body, budget_issues=issues)
+        except SchemaInvalid as exc:
+            # The comparison owner still evaluates scientific intent after shape validation.
+            if updated and isinstance(decision, dict) and decision.get("affected_scope") == "run":
+                ops = decision.get("ops")
+                if (isinstance(ops, list) and len(ops) == 1 and isinstance(ops[0], dict)
+                        and ops[0].get("op") == "close_run" and decision.get("disposition")
+                        and not decision.get("comparison_id")):
+                    exc.message += (" For ordinary Run closure, omit top-level disposition and affected_scope. "
+                                    "Keep stop_reason if it describes why the Run ended.")
+            raise
         try:
             decision, implicit = v624_operations.normalize(conn, task, goal, decision, module=module)
         except ScopeDenied:
@@ -252,7 +263,7 @@ def prepare(conn, *, run_id, task_id, lease_id, thread_id, turn_id, call_id, dec
                                                                received_metrics=received)
             delivered = v6_native.acknowledged_brief(conn, root, turn_id)
             decision = v624_comparison.normalize(conn, task, decision, metrics, received,
-                                                 packet=delivered[0] if delivered else {})
+                                                 packet=delivered[0] if delivered else {}, precise=updated)
         v6_graph.validate_body(decision, measurement_branch=implicit, lead_routes=updated and task["scope"] == "run")
     else:
         v6_graph.validate_body(decision)

@@ -34,6 +34,14 @@ def _shape(value, spec, *, measurement_branch=None, path="$", operation=None, va
                 first.field == f"{path}.{name}" for variant in variants for name in variant["properties"]):
             public_field = first.container
         reason = "; ".join([first.reason] + [f"{item.field}: {item.reason}" for item in issues[1:]])
+        if budget_issues is not None and path == "$" and first.field.startswith("$.pi_dispositions["):
+            prefix = first.field.split("]")[0].removeprefix("$.") + "]"
+            outcomes = spec["properties"]["pi_dispositions"]["items"]["properties"]["outcome"]["enum"]
+            reason += f". Supply {prefix}.feedback_id, {prefix}.outcome (one of {', '.join(outcomes)}) and {prefix}.reason."
+            ops = value.get("ops")
+            if isinstance(ops, list) and len(ops) == 1 and isinstance(ops[0], dict) and ops[0].get("op") == "close_run":
+                if "unresolved" not in ops[0]:
+                    reason += " Supply ops[0].unresolved; use [] only if you judge that no issues remain."
         raise reject(reason, field=first.field, public_field=public_field)
     if isinstance(value, str) and spec.get("minLength") and not value.strip():
         raise reject("Decision text and references must be nonempty")
@@ -93,6 +101,10 @@ def validate_body(decision, *, measurement_branch=None, lead_routes=False):
     if any(not isinstance(op, dict) for op in ops):
         raise SchemaInvalid("Expected a graph operation object")
     if (decision["mode"] == "amend") != bool(ops):
+        if lead_routes:
+            raise SchemaInvalid("Use mode=resolve for empty ops, or mode=amend with the intended graph operations. "
+                                "You can omit mode when ops already expresses your decision.",
+                                details={"field": "mode", "options": ["resolve", "amend"]})
         raise SchemaInvalid("An amendment requires operations; a resolve carries an empty list")
     if any(op["op"] == "close_run" for op in ops) and len(ops) != 1:
         raise SchemaInvalid("close_run must be the sole operation")

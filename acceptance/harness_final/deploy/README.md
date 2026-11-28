@@ -77,3 +77,11 @@ A separate read-only check opens an earlier field archive's genuine saved macro 
 | 同一乾淨檢出、本輪新測 | 55/55 | 55/55 |
 
 逐案計數、耗時及 SHA 收錄於 [tests.json](receipts/tests.json)。[兩站差異逐檔對照](receipts/release-parity.json) · [現場產品原凍結對照](receipts/formal-parity.json) · [歷史水文配方](receipts/baseF-recipe.json) · [雙語保留集](../holdout/README.md)
+
+## 晚到 PI 原件的修後版本
+
+正式場首試發現 Main 已把 PI 的補充資料路由入庫，舊的 Lead 決策包仍可結題。本組修後產品的完整／精簡凍結為 `6077e26c`／`ccd0513e`。在這兩站分別驗證補充原件可在下一個有效 Lead 決策包讀到，舊包結題要先更新，私有分支和已處置的資料維持既有作用域。修後的原場資料與首試分開保存。
+
+修後產品共有 51 個相對起點變更的交付檔，其中 50 個共通檔的 blob 在兩站相同，登錄表保留各站插件。兩個部署的歷史相容 121/121、新版 63/63、晚到回饋及受影響定向 13/13。撤去全部站點數據的乾淨檢出亦各通過新版 63/63。先前的中文、英文方法保留集在兩站均為 4/4，含雙語成對命中 4/4、僅供參考及零結果各 1/1。原 full 與 lean /2 真 Run 冷重開仍增加 0 Job、0 原生回合。
+
+完整版的既有 92 項套件首次有一個測例在 2 秒時讀到仍在 RUNNING 的 CPU 節點。修正後的測具反覆用正常入口恢復相同 Run，當指定節點到達終態再核對原 Job ID 與授權，總耗時以 20 秒為限。兩個部署的既有套件最終均為 92/92，首次輸出及修後觀察均已保存。[修後逐站回執](receipts/followup-tests.json) · [修後產品檔與登錄差異](receipts/followup-parity.json)

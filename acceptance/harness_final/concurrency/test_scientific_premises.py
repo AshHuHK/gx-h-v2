@@ -154,9 +154,9 @@ class ScientificPremises(unittest.TestCase):
         release.mkdir()
         revisions = ("4b6aa93ad5bf638d06bed7004c26c27d030a59ea","6ec604d176d307c27b3c4f7d3e7ee02e37325bce")
         baseline = next((rev for rev in revisions if subprocess.run(
-            ["git","cat-file","-e",rev],cwd=PRODUCT,capture_output=True).returncode == 0),None)
+            ["git","merge-base","--is-ancestor",rev,"HEAD"],cwd=PRODUCT,capture_output=True).returncode == 0),None)
         if baseline is None:
-            self.skipTest("This checkout does not contain either released Git baseline for cold admission")
+            self.skipTest("This packaged checkout has no released ancestor available for historical cold admission")
         with tempfile.TemporaryFile() as archive:
             subprocess.run(["git","archive",baseline,"gx-h","bin"],cwd=PRODUCT,stdout=archive,check=True)
             archive.seek(0)

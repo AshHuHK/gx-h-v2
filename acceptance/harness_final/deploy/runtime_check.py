@@ -33,6 +33,7 @@ def main():
     sys.path.insert(0,str(root/"gx-h"))
     from gx_core import contracts
     from gx_core.hostobs import host_policy
+    from gx_core.plugins.catalog import package_digest
     hashes=contracts.contract_digest()
     assert hashes==json.loads((root/"gx-h/contracts/CONTRACT_SHA").read_bytes())
     roles={}
@@ -43,6 +44,13 @@ def main():
             roles[model+"@"+(floor or "default")]=dict(sorted(pins.items()))
     registry=root/"gx-h/config/workflow_packages.json"
     packages=json.loads(registry.read_bytes())["plugins"]
+    registered = {row["path"]: row["sha256"] for row in packages}
+    if len(registered) != len(packages):
+        raise ValueError("Duplicate installed package registrations.")
+    for name, expected_pin in registered.items():
+        actual_pin = package_digest(root / "gx-h/plugins/installed" / name)
+        if actual_pin != expected_pin:
+            raise ValueError(f"Installed bytes for {name} give {actual_pin}, expected {expected_pin}.")
     data=root/"gx-h/var/science-assets/yeast-archive"
     expected=json.loads((root/"gx-h/plugins/installed/org.gx.yeast-enzyme-archive/1.0.0/snapshots.json").read_bytes())
     archives={}
@@ -57,7 +65,7 @@ def main():
               "gx-h/config/workflow_packages.json","gx-h/config/science_site_access.json",
               "gx-h/config/codex_project_role_pins.json","gx-h/contracts/CONTRACT_SHA")},
         "contract":hashes["__combined__"],"schema":hashes["db_schema.sql"],
-        "native_role_pins_verified":roles,"registered_plugins":{row["path"]:row["sha256"] for row in packages},
+        "native_role_pins_verified":roles,"registered_plugins":registered,"installed_package_digests_verified":len(registered),
         "archives":archives}
     print(json.dumps(out,indent=2))
 

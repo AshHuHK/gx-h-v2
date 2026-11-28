@@ -1,9 +1,7 @@
 """Stage a pinned GX release and the same two published hydrometry instruments in independent workspaces."""
 
-import hashlib
 import json
 from pathlib import Path
-import shutil
 import subprocess
 import sys
 import tarfile
@@ -95,10 +93,6 @@ def deploy(folder, rev):
         },
     )
     return release
-
-
-def resources():
-    return {name: sha(P / name) for name in ("daily.json", "record.json", "sites.rdb")}
 
 
 def goal_config():

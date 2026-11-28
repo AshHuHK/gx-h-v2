@@ -339,7 +339,14 @@ def arm_result(work, arm):
                 folder,
                 "SELECT job_id,task_id,idempotency_key,capability_id,capability_version,created_at,submitted_at FROM jobs",
             ),
-            "subscriptions": sql(folder, "SELECT * FROM v6_job_subscriptions"),
+            "node_requests": sql(folder, """SELECT n.node_id,n.branch_id,n.operation_key,n.status,n.job_id,
+                   n.result_ref,a.exec_key,a.reused_from FROM v6_job_attempts a
+                   JOIN v6_nodes n USING(node_id) ORDER BY n.rowid"""),
+            "subscribe_and_settle_events": sql(folder,"""SELECT event_id,ts,kind,subject_id,
+                   json_extract(payload_json,'$.job_id') AS job_id,
+                   json_extract(payload_json,'$.physical_owner') AS physical_owner
+                   FROM events WHERE kind IN ('v6.node.subscribed','v6.node.settled') ORDER BY event_id"""),
+            "in_flight_sharing_implemented":arm == "candidate",
         }
     counts, model_times = sessions(folder, runs)
     interruption = (
@@ -375,6 +382,7 @@ def arm_result(work, arm):
                     (match["request_sha256"] and j["request_sha256"] == match["request_sha256"])
                     or (
                         arm == "stock"
+                        and not match["request_sha256"]
                         and j["input_sha256"] == match["input_sha256"]
                         and j["method"] == match["method"]
                     )

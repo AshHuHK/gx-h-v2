@@ -61,6 +61,7 @@ def pin(private, candidate):
                                                 target_is_directory=True)
         recorded = {
             "product_commit": sha_id, "frozen_at": datetime.now(timezone.utc).isoformat(),
+            "python": sys.version, "sqlite":sqlite3.sqlite_version,
             "product_trees": {n:git("rev-parse", sha_id + ":" + n) for n in ("gx-h","bin","release-assets")},
             "station_policy_sha256":sha(release/"gx-h/config/science_site_access.json"),
             "plugin_registry_sha256":sha(release/"gx-h/config/workflow_packages.json"),
@@ -69,6 +70,15 @@ def pin(private, candidate):
             "preregistration_sha256":sha(HERE/"preregistered.json"),
             "official_host_sha256":sha(release / "vendor/codex-runtime/package/vendor/x86_64-unknown-linux-musl/bin/codex")
         }
+        verification = subprocess.run([str(release/".venv/bin/python"), "-B", str(release/"bin/gx-p0"),
+            "plugin", "verify", "org.gx.yeast-enzyme-archive@1.0.0", "org.gx.yeast-enzyme-archive@1.1.0",
+            "org.gx.scholarly-sources@1.0.0", "org.gx.scholarly-pages@1.1.0"],
+            cwd=release, check=True, capture_output=True, text=True)
+        plugin_receipt = json.loads(verification.stdout)
+        if plugin_receipt["failures"] or len(plugin_receipt["plugins"]) != 4:
+            raise ValueError("The registered archival or literature plugin failed its deployment check")
+        recorded["science_plugin_pins"] = [{k:item[k] for k in ("id","version","sha256") if k in item}
+                                          for item in plugin_receipt["plugins"]]
         if recorded["limits"] != manifest["profile_at_baseline"]:
             raise ValueError("The registered hard budget profile changed")
         write(release / "study-deployment.json", recorded)
